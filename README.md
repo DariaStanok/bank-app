@@ -1,4 +1,4 @@
-## Bank-App v4.0 — Modular Microservice Banking System (Concise)
+## Bank-App v1.0 — Modular Microservice Banking System (Concise)
 
 This is an educational multi-service banking platform built with **Java 21**, **Spring Boot 3.3.3**, and **Spring Cloud 2023.0.3**.  
 It demonstrates modern cloud-native architecture with centralized configuration, service discovery, secure inter-service communication, and user authentication.
