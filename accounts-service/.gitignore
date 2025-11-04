@@ -2,6 +2,9 @@ HELP.md
 target/
 !**/src/main/**/target/
 !**/src/test/**/target/
+*.jar
+*.war
+*.ea
 
 ### STS ###
 .apt_generated
