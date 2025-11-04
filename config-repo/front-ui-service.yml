@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: front-ui-service
+
+  security:
+    oauth2:
+      client:
+        registration:
+          front-ui:
+            provider: as
+            client-id: front-ui-client
+            authorization-grant-type: authorization_code
+            scope: openid,profile
+        provider:
+          as:
+            issuer-uri: ${AUTH_ISSUER}
+server:
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh

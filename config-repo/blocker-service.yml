@@ -1,0 +1,3 @@
+blocker:
+  threshold: 10000.00
+  deny-percent: 5

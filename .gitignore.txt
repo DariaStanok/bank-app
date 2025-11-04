@@ -1,0 +1,21 @@
+# VCS
+.git
+.gitignore
+
+# IDE
+.idea
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings
+
+# Build outputs
+**/target/
+**/build/
+
+# OS junk
+.DS_Store
+Thumbs.db
+

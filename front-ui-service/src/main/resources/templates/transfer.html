@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Перевод</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;margin:0}
+    main{max-width:720px;margin:0 auto;padding:16px}
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .card{border:1px solid #ddd;border-radius:12px;padding:16px}
+    .muted{color:#666}
+    input,select,button{padding:8px}
+    .actions{margin-top:12px}
+  </style>
+</head>
+<body>
+<main>
+  <div class="row" style="justify-content:space-between;margin-bottom:12px">
+    <h1 style="margin:0">Перевод средств</h1>
+    <div><a th:href="@{/ui/main(userId=${userId})}">← В кабинет</a></div>
+  </div>
+  <div class="muted" style="margin-bottom:8px">
+    Выберите счёт-отправитель, укажите ID счёта получателя и сумму перевода.
+  </div>
+
+  <section class="card">
+    <form action="/ui/transfer" method="post">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+      <input type="hidden" name="userId" th:value="${userId}"/>
+
+      <div class="row" style="margin-bottom:8px">
+        <label for="fromAccountId">От счёта:</label>
+        <select id="fromAccountId" name="fromAccountId" required>
+          <option th:each="acc : ${accounts}"
+                  th:value="${acc.id}"
+                  th:text="${'#' + acc.id + ' • ' + acc.currency + ' • баланс: ' + acc.balance}">
+            #1 • RUB • баланс: 0
+          </option>
+        </select>
+      </div>
+
+      <div class="row" style="margin-bottom:8px">
+        <label for="toAccountId">К счёту (ID):</label>
+        <input id="toAccountId" type="text" name="toAccountId" placeholder="ID счёта получателя" required/>
+      </div>
+
+      <div class="row" style="margin-bottom:8px">
+        <label for="amount">Сумма:</label>
+        <input id="amount" type="number" name="amount" step="1" min="0" placeholder="Сумма" required/>
+      </div>
+
+      <div class="actions">
+        <button type="submit">Отправить</button>
+        <a th:href="@{/ui/main(userId=${userId})}" class="muted" style="margin-left:8px">Отмена</a>
+      </div>
+    </form>
+  </section>
+</main>
+</body>
+</html>

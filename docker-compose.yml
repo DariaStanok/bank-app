@@ -1,0 +1,213 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: bank
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  discovery-service:
+    container_name: discovery-service
+    build:
+      context: .
+      dockerfile: ./discovery-service/Dockerfile
+    ports:
+    - "8761:8761"
+    environment:
+     SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+    restart: unless-stopped
+
+  config-server:
+   container_name: config-server
+   build:
+      context: .
+      dockerfile: ./config-server/Dockerfile 
+   ports:
+    - "8888:8888" 
+   volumes:
+    - ./config-repo:/config-repo:ro
+   environment:
+     SPRING_PROFILES_ACTIVE: native
+     SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS: file:/config-repo
+   restart: unless-stopped
+
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: .       
+      dockerfile: ./api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      GATEWAY_CLIENT_SECRET: ${GATEWAY_CLIENT_SECRET}
+    depends_on:
+      - config-server
+      - discovery-service
+      - auth-service
+    restart: unless-stopped
+
+  accounts-service:
+    container_name: accounts-service
+    build:
+      context: .
+      dockerfile: ./accounts-service/Dockerfile
+    expose:
+    - "8080"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - config-server
+      - discovery-service
+    restart: unless-stopped  
+
+  cash-service:
+    container_name: cash-service
+    build:
+      context: .
+      dockerfile: ./cash-service/Dockerfile
+    expose:
+      - "8080"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - config-server
+      - discovery-service
+    restart: unless-stopped 
+
+  transfer-service:
+    container_name: transfer-service
+    build:
+      context: .
+      dockerfile: ./transfer-service/Dockerfile
+    expose:
+      - "8080"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - config-server
+      - discovery-service
+    restart: unless-stopped  
+
+  notifications-service:
+    container_name: notifications-service
+    build:
+      context: .
+      dockerfile: ./notifications-service/Dockerfile
+    expose:
+      - "8080"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - config-server
+      - discovery-service
+    restart: unless-stopped  
+
+  front-ui-service:
+    container_name: front-ui-service
+    build:
+      context: .
+      dockerfile: ./front-ui-service/Dockerfile
+    ports:
+    - "8088:8080"    
+    environment:
+     SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+    depends_on:
+    - discovery-service
+    - config-server
+    restart: unless-stopped
+    
+  auth-service:
+    container_name: auth-service
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
+    expose:
+      - "8080"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - config-server
+      - discovery-service
+    restart: unless-stopped
+
+  # blocker-service:
+
+  #   build:
+  #     context: ./blocker-service
+  #     dockerfile: Dockerfile
+  #   container_name: blocker-service
+  #   expose:
+  #     - "8080"
+  #   environment:
+  #     SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #   depends_on:
+  #     - discovery-service
+  #     - config-server
+  #   restart: unless-stopped
+
+  # exchange-service:
+  #   build:
+  #     context: ./exchange-service
+  #     dockerfile: Dockerfile
+  #   container_name: exchange-service
+  #   expose:
+  #     - "8080"
+  #   environment:
+  #     SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #   depends_on:
+  #     - discovery-service
+  #     - config-server
+   #   restart: unless-stopped
+
+  # exchange-generation-service:
+  #   build:
+  #     context: ./exchange-generation-service
+  #     dockerfile: Dockerfile
+  #   container_name: exchange-generation-service
+  #   expose:
+  #     - "8080"
+  #   environment:
+  #     SPRING_CLOUD_CONFIG_URI: http://config-server:8888
+  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #   depends_on:
+  #     - discovery-service
+  #     - config-server   
+  #   restart: unless-stopped 
+

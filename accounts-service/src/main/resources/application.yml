@@ -1,0 +1,14 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: accounts-service
+  config:
+    import: "configserver:http://config-server:8888"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh
