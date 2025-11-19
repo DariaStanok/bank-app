@@ -1,1 +1,11 @@
-C:\practicum-workspace\transfer-service\src\main\java\ru\practicum\transfer\AccountsServiceApplication.java
+C:\practicum-workspace\bank-app\transfer-service\src\main\java\ru\practicum\transfer\config\HttpClientsConfig.java
+C:\practicum-workspace\bank-app\transfer-service\src\main\java\ru\practicum\transfer\config\TransferSettings.java
+C:\practicum-workspace\bank-app\transfer-service\src\main\java\ru\practicum\transfer\controller\TransferController.java
+C:\practicum-workspace\bank-app\transfer-service\src\main\java\ru\practicum\transfer\integration\AccountsClient.java
+C:\practicum-workspace\bank-app\transfer-service\src\main\java\ru\practicum\transfer\integration\BlockerClient.java
+C:\practicum-workspace\bank-app\transfer-service\src\main\java\ru\practicum\transfer\integration\ExchangeClient.java
+C:\practicum-workspace\bank-app\transfer-service\src\main\java\ru\practicum\transfer\model\Transfer.java
+C:\practicum-workspace\bank-app\transfer-service\src\main\java\ru\practicum\transfer\repository\TransferRepository.java
+C:\practicum-workspace\bank-app\transfer-service\src\main\java\ru\practicum\transfer\service\TransferService.java
+C:\practicum-workspace\bank-app\transfer-service\src\main\java\ru\practicum\transfer\service\TransferServiceImpl.java
+C:\practicum-workspace\bank-app\transfer-service\src\main\java\ru\practicum\transfer\TransferServiceApplication.java

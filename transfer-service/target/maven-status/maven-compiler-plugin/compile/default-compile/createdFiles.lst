@@ -1,1 +1,14 @@
-ru\practicum\transfer\AccountsServiceApplication.class
+ru\practicum\transfer\service\TransferServiceImpl.class
+ru\practicum\transfer\config\TransferSettings.class
+ru\practicum\transfer\integration\ExchangeClient.class
+ru\practicum\transfer\config\HttpClientsConfig.class
+ru\practicum\transfer\service\TransferService.class
+META-INF\spring-configuration-metadata.json
+ru\practicum\transfer\service\TransferServiceImpl$1.class
+ru\practicum\transfer\TransferServiceApplication.class
+ru\practicum\transfer\integration\AccountsClient.class
+ru\practicum\transfer\controller\TransferController.class
+ru\practicum\transfer\model\Transfer$TransferBuilder.class
+ru\practicum\transfer\integration\BlockerClient.class
+ru\practicum\transfer\model\Transfer.class
+ru\practicum\transfer\repository\TransferRepository.class

@@ -1,0 +1,6 @@
+dependencies:
+- name: service-template
+  repository: file://../service-template
+  version: 0.1.0
+digest: sha256:486d952603c0c8ec9afbda8697bab5632494ff246bf187fdbb5c14b163938623
+generated: "2025-11-18T16:03:32.8907963+02:00"

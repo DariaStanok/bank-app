@@ -1,32 +1,26 @@
 package ru.practicum.cash.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.support.RestClientAdapter;
-import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+import lombok.RequiredArgsConstructor;
 import ru.practicum.cash.integration.AccountsClient;
 import ru.practicum.cash.integration.BlockerClient;
+import ru.practicum.httpclient.config.ClientsRegistry;
 
 @Configuration
+@RequiredArgsConstructor
 public class HttpClientsConfig {
-	
-	   @Bean
-	   AccountsClient accountsClient(RestClient restClient) {
-	        return HttpServiceProxyFactory
-	                .builderFor(RestClientAdapter.create(restClient))
-	                .build()
-	                .createClient(AccountsClient.class);
-	}
 
-	@Bean
-	@ConditionalOnProperty(prefix = "features", name = "blocker-enabled", havingValue = "true")
-	BlockerClient blockerClient(RestClient restClient) {
-	    return HttpServiceProxyFactory
-	    		.builderFor(RestClientAdapter.create(restClient))
-	            .build()
-	            .createClient(BlockerClient.class);
-	}
+    private final ClientsRegistry clientsRegistry;
+
+    @Bean
+    AccountsClient accountsClient() {
+        return clientsRegistry.httpService("accounts", AccountsClient.class);
+    }
+
+    @Bean
+    BlockerClient blockerClient() {
+        return clientsRegistry.httpService("blocker", BlockerClient.class);
+    }
 }

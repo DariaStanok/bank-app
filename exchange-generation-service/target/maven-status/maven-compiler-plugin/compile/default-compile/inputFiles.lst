@@ -1,1 +1,7 @@
-C:\practicum-workspace\exchange-generation-service\src\main\java\ru\practicum\exchange\gen\AccountsServiceApplication.java
+C:\practicum-workspace\bank-app\exchange-generation-service\src\main\java\ru\practicum\exchange\gen\config\GeneratorSettings.java
+C:\practicum-workspace\bank-app\exchange-generation-service\src\main\java\ru\practicum\exchange\gen\config\HttpClientsConfig.java
+C:\practicum-workspace\bank-app\exchange-generation-service\src\main\java\ru\practicum\exchange\gen\controller\GenerationController.java
+C:\practicum-workspace\bank-app\exchange-generation-service\src\main\java\ru\practicum\exchange\gen\ExchangeGenerationServiceApplication.java
+C:\practicum-workspace\bank-app\exchange-generation-service\src\main\java\ru\practicum\exchange\gen\integration\ExchangeClient.java
+C:\practicum-workspace\bank-app\exchange-generation-service\src\main\java\ru\practicum\exchange\gen\service\GenerationService.java
+C:\practicum-workspace\bank-app\exchange-generation-service\src\main\java\ru\practicum\exchange\gen\service\GenerationServiceImpl.java

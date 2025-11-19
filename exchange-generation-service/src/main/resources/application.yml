@@ -1,21 +1,4 @@
-server:
-  port: 8082
-
 spring:
   application:
     name: exchange-generation-service
-  config:
-    import: 
-    - "optional:configserver:"
-    - "optional:file:./secrets.yml"
-  cloud:
-    config:
-      uri: http://localhost:8888
-      fail-fast: false
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,refresh
 

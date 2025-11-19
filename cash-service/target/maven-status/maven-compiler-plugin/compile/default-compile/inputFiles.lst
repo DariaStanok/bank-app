@@ -1,1 +1,11 @@
-C:\practicum-workspace\cash-service\src\main\java\ru\practicum\cash\AccountsServiceApplication.java
+C:\practicum-workspace\bank-app\cash-service\src\main\java\ru\practicum\cash\CashServiceApplication.java
+C:\practicum-workspace\bank-app\cash-service\src\main\java\ru\practicum\cash\config\HttpClientsConfig.java
+C:\practicum-workspace\bank-app\cash-service\src\main\java\ru\practicum\cash\config\ModelMapperConfig.java
+C:\practicum-workspace\bank-app\cash-service\src\main\java\ru\practicum\cash\controller\CashController.java
+C:\practicum-workspace\bank-app\cash-service\src\main\java\ru\practicum\cash\integration\AccountsClient.java
+C:\practicum-workspace\bank-app\cash-service\src\main\java\ru\practicum\cash\integration\BlockerClient.java
+C:\practicum-workspace\bank-app\cash-service\src\main\java\ru\practicum\cash\model\BalanceChange.java
+C:\practicum-workspace\bank-app\cash-service\src\main\java\ru\practicum\cash\model\CashOperation.java
+C:\practicum-workspace\bank-app\cash-service\src\main\java\ru\practicum\cash\repository\CashOperationRepository.java
+C:\practicum-workspace\bank-app\cash-service\src\main\java\ru\practicum\cash\service\CashService.java
+C:\practicum-workspace\bank-app\cash-service\src\main\java\ru\practicum\cash\service\CashServiceImpl.java

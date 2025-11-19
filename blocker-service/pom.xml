@@ -7,21 +7,16 @@
 	<parent>
 		<groupId>ru.practicum</groupId>
 		<artifactId>bank-app</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>blocker-service</artifactId>
 	<name>blocker-service</name>
 	<packaging>jar</packaging>
-	<description>Web Spring Boot application</description>
+	<description>Blocker service</description>
 
 
 	<dependencies>
-		<!-- JPA -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
 		<!-- REST API  -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -39,73 +34,46 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-
-		<!-- Eureka Client  -->
+				
+		<!-- Resilience4j без Spring Cloud -->
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-spring-boot3</artifactId>
 		</dependency>
 
-		<!-- Config Client -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-		</dependency>
-
-		<!-- Circuit Breaker (Resilience4j через Spring Cloud) -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
-		</dependency>
-
-		<!-- OpenAPI/Swagger UI  -->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>${springdoc.version}</version>
-		</dependency>
-
-		<!-- Notifications starter  -->
+		<!-- Internal starters / contracts -->
 		<dependency>
 			<groupId>ru.practicum</groupId>
 			<artifactId>platform-notifications-client-starter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<!-- Web Exception starter  -->
 		<dependency>
 			<groupId>ru.practicum</groupId>
 			<artifactId>platform-web-exception-starter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<!-- PostgreSQL  -->
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-
-		<!-- Lombok  -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-        <!-- Transfer contracts  -->
 		<dependency>
 			<groupId>ru.practicum</groupId>
 			<artifactId>platform-contracts</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
-		<!-- Security  -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
+			<groupId>ru.practicum</groupId>
+			<artifactId>platform-http-client-starter</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ru.practicum</groupId>
+			<artifactId>platform-security-starter</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
+		<!-- Lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
 		<!-- Тесты -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -127,6 +95,11 @@
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 

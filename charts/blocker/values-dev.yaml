@@ -1,0 +1,17 @@
+﻿image:
+  repository: docker.io/dariaku/blocker-service   
+
+env:
+  SPRING_PROFILES_ACTIVE: dev
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth:8080/auth"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+
+config:
+  enabled: true
+  data:
+    BLOCKER_THRESHOLD: "10000.00"
+    BLOCKER_DENY_PERCENT: "5"
+clients: {}         
+
+ingress:
+  enabled: false

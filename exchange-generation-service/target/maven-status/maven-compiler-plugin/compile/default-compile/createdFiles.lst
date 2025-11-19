@@ -1,1 +1,7 @@
-ru\practicum\exchange\gen\AccountsServiceApplication.class
+ru\practicum\exchange\gen\ExchangeGenerationServiceApplication.class
+ru\practicum\exchange\gen\config\GeneratorSettings.class
+ru\practicum\exchange\gen\controller\GenerationController.class
+ru\practicum\exchange\gen\service\GenerationService.class
+ru\practicum\exchange\gen\integration\ExchangeClient.class
+ru\practicum\exchange\gen\service\GenerationServiceImpl.class
+ru\practicum\exchange\gen\config\HttpClientsConfig.class

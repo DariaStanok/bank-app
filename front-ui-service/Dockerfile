@@ -1,21 +1,17 @@
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /wrk
 
-COPY ./pom.xml ./pom.xml
-COPY ./front-ui-service/pom.xml ./front-ui-service/pom.xml
+COPY . .
 
-COPY .mvn/ .mvn/
-COPY mvnw .
-RUN chmod +x mvnw && ./mvnw -q -DskipTests dependency:go-offline
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 
-COPY ./front-ui-service/src ./front-ui-service/src
+RUN ./mvnw -q -DskipTests -pl front-ui-service -am clean package
 
-RUN ./mvnw -q -DskipTests -pl front-ui-service -am package
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-COPY --from=build /wrk/front-ui-service/target/*.jar /app/app.jar
+COPY --from=build /wrk/front-ui-service/target/front-ui-service-*.jar /app/app.jar
 
 RUN useradd -r -u 1001 appuser && chown -R appuser /app
 USER appuser

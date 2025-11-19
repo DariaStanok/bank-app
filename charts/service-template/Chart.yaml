@@ -1,0 +1,5 @@
+﻿apiVersion: v2
+name: service-template
+description: Common library chart for bank-app services
+type: library
+version: 0.1.0

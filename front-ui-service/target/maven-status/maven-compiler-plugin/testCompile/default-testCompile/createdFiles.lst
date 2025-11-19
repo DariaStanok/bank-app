@@ -1,3 +1,3 @@
-ru\practicum\frontui\AccountsServiceApplicationTests.class
+ru\practicum\frontui\FrontUIServiceApplicationTests.class
 ru\practicum\frontui\TestcontainersConfiguration.class
-ru\practicum\frontui\TestAccountsServiceApplication.class
+ru\practicum\frontui\TestFrontUIServiceApplication.class

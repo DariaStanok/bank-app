@@ -1,1 +1,7 @@
-C:\practicum-workspace\notifications-service\src\main\java\ru\practicum\notifications\AccountsServiceApplication.java
+C:\practicum-workspace\bank-app\notifications-service\src\main\java\ru\practicum\notifications\config\ModelMapperConfig.java
+C:\practicum-workspace\bank-app\notifications-service\src\main\java\ru\practicum\notifications\controller\NotificationsController.java
+C:\practicum-workspace\bank-app\notifications-service\src\main\java\ru\practicum\notifications\model\Notification.java
+C:\practicum-workspace\bank-app\notifications-service\src\main\java\ru\practicum\notifications\NotificationsServiceApplication.java
+C:\practicum-workspace\bank-app\notifications-service\src\main\java\ru\practicum\notifications\repository\NotificationRepository.java
+C:\practicum-workspace\bank-app\notifications-service\src\main\java\ru\practicum\notifications\service\NotificationsService.java
+C:\practicum-workspace\bank-app\notifications-service\src\main\java\ru\practicum\notifications\service\NotificationsServiceImpl.java

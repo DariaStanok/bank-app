@@ -1,21 +1,17 @@
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /wrk
 
-COPY ./pom.xml ./pom.xml
-COPY ./auth-service/pom.xml ./auth-service/pom.xml
+COPY . .
 
-COPY .mvn/ .mvn/
-COPY mvnw .
-RUN chmod +x mvnw && ./mvnw -q -DskipTests dependency:go-offline
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 
-COPY ./auth-service/src ./auth-service/src
+RUN ./mvnw -q -DskipTests -pl auth-service -am clean package
 
-RUN ./mvnw -q -DskipTests -pl auth-service -am package
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-COPY --from=build /wrk/auth-service/target/*.jar /app/app.jar
+COPY --from=build /wrk/auth-service/target/auth-service-*.jar /app/app.jar
 
 RUN useradd -r -u 1001 appuser && chown -R appuser /app
 USER appuser

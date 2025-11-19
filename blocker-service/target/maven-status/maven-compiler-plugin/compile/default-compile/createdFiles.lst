@@ -1,1 +1,6 @@
-ru\practicum\blocker\AccountsServiceApplication.class
+ru\practicum\blocker\controller\BlockerController.class
+ru\practicum\blocker\config\BlockerSettings.class
+ru\practicum\blocker\service\BlockerService.class
+META-INF\spring-configuration-metadata.json
+ru\practicum\blocker\service\BlockerServiceImpl.class
+ru\practicum\blocker\BlockerServiceApplication.class
