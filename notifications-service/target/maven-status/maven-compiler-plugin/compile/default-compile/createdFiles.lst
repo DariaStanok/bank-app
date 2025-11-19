@@ -1,8 +1,0 @@
-ru\practicum\notifications\controller\NotificationsController.class
-ru\practicum\notifications\model\Notification$NotificationBuilder.class
-ru\practicum\notifications\model\Notification.class
-ru\practicum\notifications\repository\NotificationRepository.class
-ru\practicum\notifications\NotificationsServiceApplication.class
-ru\practicum\notifications\service\NotificationsService.class
-ru\practicum\notifications\service\NotificationsServiceImpl.class
-ru\practicum\notifications\config\ModelMapperConfig.class

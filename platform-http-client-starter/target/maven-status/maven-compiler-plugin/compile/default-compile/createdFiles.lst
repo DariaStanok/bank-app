@@ -1,6 +1,0 @@
-ru\practicum\httpclient\config\HttpClientsAutoConfiguration.class
-ru\practicum\httpclient\props\ClientProps.class
-ru\practicum\httpclient\props\ClientsProperties.class
-ru\practicum\httpclient\config\ClientsRegistry.class
-META-INF\spring-configuration-metadata.json
-ru\practicum\httpclient\config\CorrelationAndLogInterceptor.class
