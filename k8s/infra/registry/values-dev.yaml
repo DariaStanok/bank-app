@@ -1,0 +1,6 @@
+﻿registry:
+  server: "https://your-registry.example.com"
+  username: "dev-user"
+  password: "CHANGE_ME_LOCAL_ONLY"
+  email: "name@gmail.com"   
+  secretName: regcred

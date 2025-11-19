@@ -1,0 +1,17 @@
+{
+  "groups": [
+    {
+      "name": "clients",
+      "type": "ru.practicum.httpclient.props.ClientsProperties",
+      "sourceType": "ru.practicum.httpclient.props.ClientsProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "clients.map",
+      "type": "java.util.Map<java.lang.String,ru.practicum.httpclient.props.ClientProps>",
+      "sourceType": "ru.practicum.httpclient.props.ClientsProperties"
+    }
+  ],
+  "hints": []
+}

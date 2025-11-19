@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Личный кабинет</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;margin:0}
+    header,main{max-width:1000px;margin:0 auto;padding:16px}
+    .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+    .card{border:1px solid #ddd;border-radius:12px;padding:16px}
+    .row{display:flex;gap:8px;align-items:center}
+    .muted{color:#666;font-size:.9rem}
+    .actions form{display:inline}
+    .banner{border:1px solid #cfc;background:#f6fff6;border-radius:12px;padding:12px;margin-bottom:12px}
+    .banner.error{border-color:#f99;background:#fff6f6}
+  </style>
+</head>
+<body>
+<header>
+  <div class="row" style="justify-content:space-between">
+    <div>
+      <h1 style="margin:0 0 4px 0">Личный кабинет</h1>
+      <div class="muted" th:if="${user != null}">
+        <span th:text="${user.user != null ? user.user.username : '—'}">username</span>
+      </div>
+    </div>
+    <div class="actions">
+      <form action="/ui/logout" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <button type="submit">Выйти</button>
+      </form>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div th:if="${cashStatus != null}" class="banner">
+    Операция по счёту <b th:text="${cashOpId}">op</b> завершена со статусом:
+    <b th:text="${cashStatus}">OK</b>.
+    Новый баланс: <b th:text="${cashNewBal}">0</b>
+  </div>
+
+  <div th:if="${trStatus != null}" class="banner">
+    Перевод <b th:text="${trOpId}">op</b> — статус: <b th:text="${trStatus}">OK</b>.
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2 style="margin:0 0 8px 0">Действия</h2>
+      <div class="row">
+        <a th:href="@{/ui/profile(userId=${userId})}">Настройки аккаунта</a>
+        <span class="muted">/</span>
+        <a th:href="@{/ui/accounts(userId=${userId})}">Мои счета</a>
+        <span class="muted">/</span>
+        <a th:href="@{/ui/transfer(userId=${userId})}">Перевод</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin:0 0 8px 0">Текущий счёт</h2>
+      <div class="muted">ID</div>
+      <div th:text="${user != null && user.currentAccount != null ? user.currentAccount.id : '—'}">accountId</div>
+      <div class="muted" style="margin-top:8px">Баланс</div>
+      <div th:text="${user != null && user.currentAccount != null ? user.currentAccount.balance : '—'}">0</div>
+
+      <hr/>
+      <form action="/ui/balance/deposit" method="post" class="row">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" name="userId" th:value="${userId}"/>
+        <input type="hidden" name="accountId"
+               th:value="${user != null && user.currentAccount != null ? user.currentAccount.id : ''}"/>
+        <input type="hidden" name="currency"
+               th:value="${user != null && user.currentAccount != null ? user.currentAccount.currency : ''}"/>
+        <input type="number" name="amount" step="1" min="0" placeholder="Сумма"/>
+        <button type="submit">Положить</button>
+      </form>
+
+      <form action="/ui/balance/withdraw" method="post" class="row" style="margin-top:6px">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" name="userId" th:value="${userId}"/>
+        <input type="hidden" name="accountId"
+               th:value="${user != null && user.currentAccount != null ? user.currentAccount.id : ''}"/>
+        <input type="hidden" name="currency"
+               th:value="${user != null && user.currentAccount != null ? user.currentAccount.currency : ''}"/>
+        <input type="number" name="amount" step="1" min="0" placeholder="Сумма"/>
+        <button type="submit">Снять</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2 style="margin:0 0 8px 0">Мои счета</h2>
+      <ul style="padding-left:18px;margin:0">
+        <li th:each="acc : ${user != null ? user.accounts : {}}">
+          <span th:text="${'#' + acc.id}">#1</span> —
+          <span th:text="${acc.currency}">ILS</span> :
+          <strong th:text="${acc.balance}">0</strong>
+        </li>
+      </ul>
+      <div style="margin-top:8px">
+        <a th:href="@{/ui/accounts(userId=${userId})}">Управление счетами</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 style="margin:0 0 8px 0">Быстрый перевод</h2>
+      <form action="/ui/transfer" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" name="userId" th:value="${userId}"/>
+
+        <div class="row">
+          <label>От счёта:</label>
+          <select name="fromAccountId">
+            <option th:each="acc : ${user != null ? user.accounts : {}}"
+                    th:value="${acc.id}"
+                    th:text="${acc.id + ' • ' + acc.currency}">account</option>
+          </select>
+        </div>
+
+        <div style="margin-top:6px; display:flex; flex-direction:column; gap:6px">
+          <input type="text" name="toAccountId" placeholder="ID счёта получателя" style="width:100%"/>
+          <input type="number" name="amount" step="1" min="0" placeholder="Сумма" style="width:100%"/>
+        </div>
+
+        <div style="margin-top:8px">
+          <button type="submit">Отправить</button>
+          <a th:href="@{/ui/transfer(userId=${userId})}" class="muted" style="margin-left:8px">Расширенная форма</a>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2 style="margin:0 0 8px 0">Уведомления</h2>
+
+      <div class="muted" th:if="${notifications == null or notifications.isEmpty()}">
+        Пока нет уведомлений
+      </div>
+
+      <ul th:if="${notifications != null and !notifications.isEmpty()}" style="padding-left:18px;margin:0">
+        <li th:each="n : ${notifications}">
+          <div>
+            <b th:text="${n.event}">EVENT</b>
+            <span th:if="${n.operationId != null}"> — <span th:text="${'op=' + n.operationId}">op=...</span></span>
+          </div>
+          <div th:text="${n.message}">Сообщение</div>
+          <div class="muted" th:text="${n.at}">2025-10-30T10:00:00Z</div>
+        </li>
+      </ul>
+    </section>
+
+  </div>
+</main>
+</body>
+</html>

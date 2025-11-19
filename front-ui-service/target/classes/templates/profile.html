@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Профиль пользователя</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;margin:0}
+    main{max-width:800px;margin:0 auto;padding:16px}
+    .card{border:1px solid #ddd;border-radius:12px;padding:16px;margin-bottom:16px}
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .muted{color:#666}
+    input,button{padding:8px}
+  </style>
+</head>
+<body>
+<main>
+  <div class="row" style="justify-content:space-between;margin-bottom:8px">
+    <h1 style="margin:0">Профиль</h1>
+    <div><a th:href="@{/ui/main(userId=${userId})}">← В кабинет</a></div>
+  </div>
+
+  <div class="muted" style="margin-bottom:12px">
+    Пользователь:
+    <strong th:text="${user != null && user.user != null ? user.user.username : '—'}">username</strong>
+  </div>
+  <section class="card">
+    <h2 style="margin:0 0 8px 0">Обновить профиль</h2>
+    <form th:action="@{/ui/profile/update(userId=${userId})}" method="post" class="row">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+      <input type="text" name="firstName" placeholder="Имя"
+             th:value="${user != null && user.user != null ? user.user.firstName : ''}" />
+      <input type="text" name="lastName" placeholder="Фамилия"
+             th:value="${user != null && user.user != null ? user.user.lastName : ''}" />
+      <input type="email" name="email" placeholder="Email"
+             th:value="${user != null && user.user != null ? user.user.email : ''}" />
+      <input type="date" name="birthDate"
+             th:value="${user != null && user.user != null ? user.user.birthDate : ''}" />
+      <button type="submit">Сохранить</button>
+    </form>
+  </section>
+  <section class="card">
+    <h2 style="margin:0 0 8px 0">Смена пароля</h2>
+    <form th:action="@{/ui/profile/password(userId=${userId})}" method="post" class="row">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+      <input type="email" name="email" placeholder="Email для проверки"
+             th:value="${user != null && user.user != null ? user.user.email : ''}" />
+      <input type="password" name="newPassword" placeholder="Новый пароль" />
+      <button type="submit">Изменить</button>
+    </form>
+  </section>
+  <section class="card">
+    <h2 style="margin:0 0 8px 0">Удалить аккаунт</h2>
+    <form th:action="@{/ui/profile/delete(userId=${userId})}" method="post"
+          onsubmit="return confirm('Удалить учётную запись?');">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+      <button type="submit">Удалить</button>
+    </form>
+    <div class="muted" style="margin-top:8px">
+      Удаление возможно только если все счета имеют нулевой баланс
+    </div>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "groups": [
+    {
+      "name": "transfer",
+      "type": "ru.practicum.transfer.config.TransferSettings",
+      "sourceType": "ru.practicum.transfer.config.TransferSettings"
+    }
+  ],
+  "properties": [
+    {
+      "name": "transfer.blocker-enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "ru.practicum.transfer.config.TransferSettings"
+    },
+    {
+      "name": "transfer.exchange-required",
+      "type": "java.lang.Boolean",
+      "sourceType": "ru.practicum.transfer.config.TransferSettings"
+    }
+  ],
+  "hints": []
+}

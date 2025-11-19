@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Вход</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;margin:0}
+    main{max-width:720px;margin:0 auto;padding:16px}
+    .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .card{border:1px solid #ddd;border-radius:12px;padding:16px}
+    .muted{color:#666}
+    input,select,button{padding:8px}
+    .actions{margin-top:12px}
+  </style>
+</head>
+<body>
+<main>
+  <section class="card">
+    <h1>Вход</h1>
+
+    <p>
+      <a href="/oauth2/authorization/front-ui">Войти</a>
+    </p>
+
+    <p>
+      Нет аккаунта? <a href="/ui/register">Зарегистрироваться</a>
+    </p>
+  </section>
+</main>
+</body>
+</html>
