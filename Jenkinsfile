@@ -4,21 +4,19 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checking Jenkins takes from SCM in the job 
                 checkout scm
             }
         }
 
-        stage('Maven: check version') {
-            steps {
-                // Checking mvn inside the Jenkins container  
-                sh 'mvn -v'
+        stage('Maven Build') {
+            agent {
+                docker {
+                    image 'maven:3.9.6-eclipse-temurin-21'
+                    args '-v $HOME/.m2:/root/.m2'
+                }
             }
-        }
-
-        stage('Maven: build') {
             steps {
-                // Build multi-module project without tests
+                sh 'mvn -v'
                 sh 'mvn clean package -DskipTests'
             }
         }
