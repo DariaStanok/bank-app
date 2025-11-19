@@ -7,20 +7,6 @@ External access is handled by **Ingress + ingress-nginx**, configuration is mana
 
 ---
 
-## Evolution from v1.0
-
-This project is an evolution of v1.0:
-
-- ❌ No Spring Cloud Config Server  
-- ❌ No Eureka Discovery Service  
-- ❌ No Spring Cloud Gateway  
-- ✅ Yes — Ingress + DNS for routing  
-- ✅ Yes — Helm for templated deployments  
-- ✅ Yes — Kubernetes namespaces for dev / test / prod  
-- ✅ Yes — StatefulSets for databases  
-
----
-
 ## Modules
 
 ### Front-UI Service
