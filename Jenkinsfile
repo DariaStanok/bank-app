@@ -1,6 +1,16 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout(false)
+        ansiColor('xterm')
+    }
+
+    environment {
+        DOCKERHUB_REPO = 'dariaku'
+        K8S_NAMESPACE  = 'dev'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -8,13 +18,22 @@ pipeline {
             }
         }
 
-        stage('Maven Build') {
+        stage('Build (Maven)') {
             steps {
-                sh '''
-                  mvn -v
-                  mvn clean package -DskipTests
-                '''
+                sh 'mvn -q -DskipTests clean package'
             }
+        }
+    }   
+
+    post {
+        always {
+            echo 'Pipeline finished (success or fail)'
+        }
+        success {
+            echo 'Maven build succeeded'
+        }
+        failure {
+            echo 'Maven build failed, check logs above'
         }
     }
 }
