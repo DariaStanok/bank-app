@@ -3,7 +3,6 @@ pipeline {
 
     options {
         skipDefaultCheckout(false)
-        ansiColor('xterm')
     }
 
     environment {
@@ -14,16 +13,20 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                ansiColor('xterm') {
+                    checkout scm
+                }
             }
         }
 
         stage('Build (Maven)') {
             steps {
-                sh 'mvn -q -Dmaven.test.skip=true clean package'
+                ansiColor('xterm') {
+                    sh 'mvn -q -Dmaven.test.skip=true clean package'
+                }
             }
         }
-    }   
+    }
 
     post {
         always {
