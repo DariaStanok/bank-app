@@ -8,7 +8,7 @@ pipeline {
     environment {
         DOCKERHUB_REPO   = 'dariaku'
         DOCKER_TAG       = 'v2'
-        DOCKER_DRY_RUN   = 'true'  
+        DOCKER_DRY_RUN   = 'false'  
 
         K8S_NAMESPACE_DEV = 'dev'
         HELM_DRY_RUN      = 'true' 
