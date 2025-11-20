@@ -6,10 +6,12 @@ pipeline {
     }
 
     environment {
-        DOCKERHUB_REPO = 'dariaku'
-        K8S_NAMESPACE  = 'dev'
-        DOCKER_TAG     = 'v2'      
-        DOCKER_DRY_RUN = 'true'   
+        DOCKERHUB_REPO   = 'dariaku'
+        DOCKER_TAG       = 'v2'
+        DOCKER_DRY_RUN   = 'true'  
+
+        K8S_NAMESPACE_DEV = 'dev'
+        HELM_DRY_RUN      = 'true' 
     }
 
     stages {
@@ -30,7 +32,7 @@ pipeline {
             }
         }
 
-        stage('Build Docker images') {
+        stage('Build Docker images (dev)') {
             steps {
                 ansiColor('xterm') {
                     script {
@@ -48,7 +50,7 @@ pipeline {
 
                         services.each { svc ->
                             if (env.DOCKER_DRY_RUN == 'true') {
-                                echo "DRY RUN: docker build -t ${svc.image} -f ${svc.dir}/Dockerfile ."
+                                echo "DRY RUN (build): docker build -t ${svc.image} -f ${svc.dir}/Dockerfile ."
                             } else {
                                 sh """
                                   docker build \\
@@ -62,7 +64,7 @@ pipeline {
             }
         }
 
-        stage('Push Docker images') {
+        stage('Push Docker images (dev)') {
             steps {
                 ansiColor('xterm') {
                     script {
@@ -75,12 +77,12 @@ pipeline {
                             "${DOCKERHUB_REPO}/front-ui:${DOCKER_TAG}",
                             "${DOCKERHUB_REPO}/blocker-service:${DOCKER_TAG}",
                             "${DOCKERHUB_REPO}/exchange-service:${DOCKER_TAG}",
-                            "${DOCKERHUB_REPO}/exchange-generator:${DOCKER_TAG}",
+                            "${DOCKERHUB_REPO}/exchange-generator:${DOCKER_TAG}"
                         ]
 
                         if (env.DOCKER_DRY_RUN == 'true') {
                             images.each { img ->
-                                echo "DRY RUN: docker push ${img}"
+                                echo "DRY RUN (push): docker push ${img}"
                             }
                         } else {
                             withCredentials([usernamePassword(
@@ -91,11 +93,33 @@ pipeline {
                                 sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
 
                                 images.each { img ->
-                                    sh """
-                                      docker push ${img}
-                                    """
+                                    sh "docker push ${img}"
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to dev (Helm)') {
+            steps {
+                ansiColor('xterm') {
+                    script {
+                        if (env.HELM_DRY_RUN == 'true') {
+                            echo "DRY RUN (helm): helm upgrade --install bank-app-dev charts/umbrella -n ${K8S_NAMESPACE_DEV} -f charts/umbrella/values-dev.yaml --dry-run --debug"
+                            sh """
+                              helm upgrade --install bank-app-dev charts/umbrella \\
+                                -n ${K8S_NAMESPACE_DEV} \\
+                                -f charts/umbrella/values-dev.yaml \\
+                                --dry-run --debug
+                            """
+                        } else {
+                            sh """
+                              helm upgrade --install bank-app-dev charts/umbrella \\
+                                -n ${K8S_NAMESPACE_DEV} \\
+                                -f charts/umbrella/values-dev.yaml
+                            """
                         }
                     }
                 }
@@ -108,10 +132,10 @@ pipeline {
             echo 'Pipeline finished (success or fail)'
         }
         success {
-            echo 'Maven build succeeded'
+            echo 'Maven + Docker + Helm (dev) pipeline succeeded'
         }
         failure {
-            echo 'Maven build failed, check logs above'
+            echo 'Pipeline failed, check stages above'
         }
     }
 }
