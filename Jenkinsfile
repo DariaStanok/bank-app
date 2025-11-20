@@ -107,16 +107,12 @@ pipeline {
                 ansiColor('xterm') {
                     script {
                         if (env.HELM_DRY_RUN == 'true') {
-                            echo "DRY RUN (helm): helm upgrade --install bank-app-dev charts/umbrella -n ${K8S_NAMESPACE_DEV} -f charts/umbrella/values-dev.yaml --dry-run --debug"
-                            sh """
-                              helm upgrade --install bank-app-dev charts/umbrella \\
-                                -n ${K8S_NAMESPACE_DEV} \\
-                                -f charts/umbrella/values-dev.yaml \\
-                                --dry-run --debug
-                            """
+                            echo "DRY RUN (helm, not executed in Jenkins): " +
+                                    "helm upgrade --install bank-app-dev charts/umbrella " +
+                                    "-n ${K8S_NAMESPACE_DEV} -f charts/umbrella/values-dev.yaml --dry-run --debug"
                         } else {
                             sh """
-                              helm upgrade --install bank-app-dev charts/umbrella \\
+                                helm upgrade --install bank-app-dev charts/umbrella \\
                                 -n ${K8S_NAMESPACE_DEV} \\
                                 -f charts/umbrella/values-dev.yaml
                             """
@@ -125,8 +121,8 @@ pipeline {
                 }
             }
         }
-    }
-
+    }       
+    
     post {
         always {
             echo 'Pipeline finished (success or fail)'
