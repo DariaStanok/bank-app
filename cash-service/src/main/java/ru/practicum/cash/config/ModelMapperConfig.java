@@ -6,10 +6,12 @@ import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import ru.practicum.cash.model.CashOperation;
 import ru.practicum.platform.contracts.cash.CashOperationViewDto;
 
+@Configuration
 public class ModelMapperConfig {
 
     @Bean
@@ -19,7 +21,7 @@ public class ModelMapperConfig {
           .setFieldMatchingEnabled(true)
           .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE)
           .setMatchingStrategy(MatchingStrategies.STRICT);
-        
+
         Converter<CashOperation, CashOperationViewDto> opToView = ctx -> {
             CashOperation src = ctx.getSource();
             Instant at = src.getCompletedAt() != null ? src.getCompletedAt() : src.getCreatedAt();
@@ -33,7 +35,9 @@ public class ModelMapperConfig {
                     .at(at)
                     .build();
         };
-        mm.createTypeMap(CashOperation.class, CashOperationViewDto.class).setConverter(opToView);
+
+        mm.createTypeMap(CashOperation.class, CashOperationViewDto.class)
+          .setConverter(opToView);
 
         return mm;
     }

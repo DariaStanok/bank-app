@@ -1,135 +1,286 @@
-## Bank-App v1.0 — Modular Microservice Banking System (Concise)
+# Bank-App v2.0 --- Kubernetes-Native Microservice Banking System
 
-This is an educational multi-service banking platform built with **Java 21**, **Spring Boot 3.3.3**, and **Spring Cloud 2023.0.3**.  
-It demonstrates modern cloud-native architecture with centralized configuration, service discovery, secure inter-service communication, and user authentication.
+Bank-App v2.0 is a modular microservice banking platform implemented
+with **Java 21**, **Spring Boot 3.3.3**, and **Spring Security 6**,
+fully migrated to a **Kubernetes-native infrastructure** using Helm,
+Ingress-NGINX, ConfigMaps/Secrets, StatefulSets, and CI/CD via Jenkins.
 
-Each service runs as an **executable JAR** and communicates via **REST + OAuth2 (client-credentials)** through a unified **API Gateway**.  
-The system is fully Dockerized and connected through **Spring Cloud Eureka** and **Config Server** (native backend).
+Each service is packaged as an **executable JAR** and deployed as a
+**Kubernetes Deployment**.\
+Service-to-service communication uses **REST + OAuth2 client-credentials
+flow**.\
+All persistent storage is provided by **PostgreSQL StatefulSets**.
 
----
+------------------------------------------------------------------------
 
-## Modules
+## Architecture Overview
 
-| Module | Responsibilities | Tech Stack |
-|:--------|:-----------------|:------------|
-| **Front-UI Service** | Web UI (Spring MVC + Thymeleaf) for users: registration, login/logout, dashboard, transfers, balance management. | Spring MVC, Thymeleaf, OAuth2 Client |
-| **API Gateway** | Single entry point for all HTTP traffic; routes to services, aggregates Swagger, handles internal OAuth2. | Spring Cloud Gateway |
-| **Auth Service** | OAuth2 Authorization Server (OpenID Connect); issues tokens for users and internal clients. | Spring Security OAuth2 Authorization Server |
-| **Accounts Service** | User and account management; profile updates, account creation, per-currency accounts. | Spring Boot, JPA, PostgreSQL |
-| **Cash Service** | Handles deposits and withdrawals, enforces balance rules, interacts with Accounts. | Spring Boot, JPA, PostgreSQL |
-| **Transfer Service** | Manages inter-account transfers, transactional integrity, currency checks. | Spring Boot, JPA, PostgreSQL |
-| **Notifications Service** | Stores and exposes user notifications and system events. | Spring Boot, JPA, PostgreSQL |
-| **Discovery Service** | Eureka Server — service registry for all modules. | Spring Cloud Netflix Eureka Server |
-| **Config Server** | Centralized configuration via `config-repo/` (native filesystem). | Spring Cloud Config Server |
+### Key Features
 
----
+-   Kubernetes workloads managed via **Helm** (umbrella chart +
+    per-service charts)
+-   Service discovery handled by **Kubernetes Services** (DNS names:
+    `accounts`, `cash`, etc.)
+-   **Ingress-NGINX** serves as the API Gateway
+-   External configuration via **ConfigMaps** and **Secrets**
+-   Built-in **OAuth2 Authorization Server**
+-   Fully automated CI/CD pipeline using **Jenkins**
 
-## Technologies
+### Removed Components from v1.0
 
-- **Language / Runtime**: Java 21  
-- **Frameworks**: Spring Boot 3.3.3 · Spring Cloud 2023.0.3 · Spring Security 6 · Springdoc OpenAPI 2.5  
-- **Persistence**: PostgreSQL (schema-per-service)  
-- **Build System**: Maven (multi-module)  
-- **Discovery & Config**: Eureka + Config Server (native)  
-- **API Gateway**: Spring Cloud Gateway (Netty)  
-- **Auth**: OAuth2 / OIDC Authorization Server  
-- **Testing**: JUnit 5 · Testcontainers · Spring Boot Test  
-- **Containerization**: Docker (multi-service `docker-compose`)  
-- **Mapping / Utils**: ModelMapper · Lombok  
+The following are **no longer used**: - Spring Cloud Config Server\
+- Eureka Discovery Service\
+- Spring Cloud Gateway\
+- Consul / ZooKeeper
 
----
+All their responsibilities are now handled by **native Kubernetes
+features**.
 
-## Public API Summary
+------------------------------------------------------------------------
 
-### Gateway (API Aggregation)
-| Route | Description |
-|:------|:-------------|
-| `/api/v1/users/**` → Accounts Service | User & account operations |
-| `/api/v1/cash/**` → Cash Service | Deposits / withdrawals |
-| `/api/v1/transfers/**` → Transfer Service | Transfers between accounts |
-| `/api/v1/notifications/**` → Notifications Service | Notifications and system messages |
-| `/auth/**` → Auth Service | OAuth2 endpoints |
-| `/ui/**` → Front-UI | User-facing web pages |
+## Microservices Overview
 
-### OAuth2 Endpoints (Auth Service)
-| Endpoint | Description |
-|:----------|:-------------|
-| `/auth/oauth2/token` | Issue token (client credentials grant) |
-| `/auth/.well-known/openid-configuration` | OIDC metadata |
-| `/auth/authorize` / `/auth/token` | Authorization Code flow for Front-UI |
+### **Auth Service**
 
----
+-   OAuth2 Authorization Server\
+-   Supports Authorization Code & Client Credentials flows\
+-   Issues JWT tokens for internal services and front-end users
 
-## Configuration (env vars / placeholders)
+### **Front-UI Service**
 
-| Variable | Purpose |
-|:----------|:---------|
-| `POSTGRES_USER` / `POSTGRES_PASSWORD` | Shared DB credentials |
-| `AUTH_ISSUER` | Issuer URI for JWT (e.g. `http://localhost:8080/auth`) |
-| `GATEWAY_CLIENT_SECRET` | Secret for Gateway OAuth2 client |
-| `SPRING_CLOUD_CONFIG_URI` | Config Server endpoint (default `http://config-server:8888`) |
-| `EUREKA_CLIENT_SERVICEURL_DEFAULTZONE` | Eureka registry endpoint |
+-   Spring MVC + Thymeleaf\
+-   Provides UI for login, registration, dashboard, transfers
 
----
+### **Accounts Service**
 
-## Database Setup
+-   Manages user profiles\
+-   Maintains bank accounts (per currency)\
+-   Validates domain rules
 
-- Single PostgreSQL instance with separate schemas per service:  
-  `accounts`, `cash`, `transfer`, `notifications`.  
-- Schema initialization via `src/main/resources/db/init_<service>_schema.sql`.
-- Root DB and schemas are created automatically through  
-  `init/init_main_schema.sql` mounted to `/docker-entrypoint-initdb.d` in Postgres.
+### **Cash Service**
 
----
+-   Handles deposits and withdrawals\
+-   Integrates with Accounts & Notifications
 
-## Docker Deployment
+### **Transfer Service**
 
-All modules are built and run via a unified `docker-compose.yml`:
+-   Manages P2P transfers\
+-   Uses Exchange, Blocker, and Notifications services\
+-   Supports complex transactional logic
 
-```bash
-docker compose build        # Build all service images
-docker compose up -d        # Start full system
-docker compose ps           # Check running containers
-docker compose logs -f      # Follow logs
-```
+### **Notifications Service**
 
-Key exposed ports:
+-   Stores and retrieves system & user notifications
 
-| Service | Port |
-|:---------|:------|
-| Config Server | 8888 |
-| Discovery (Eureka) | 8761 |
-| API Gateway | 8080 |
-| Front-UI | 8088 |
-| Auth Service | 8090 |
-| PostgreSQL | 5432 |
+### **Exchange Service**
 
-After startup:
-- Config Server → [http://localhost:8888/actuator/health](http://localhost:8888/actuator/health)
-- Eureka Dashboard → [http://localhost:8761](http://localhost:8761)
-- Swagger UI (aggregated) → [http://localhost:8080/swagger-ui](http://localhost:8080/swagger-ui)
+-   Provides FX conversion rates
 
----
+### **Exchange-Generation Service**
 
-## Development Notes
+-   Periodically updates FX rates for Exchange Service
 
-- Each service uses **Config Server** and **Eureka** for bootstrapping.  
-  No local `application.yml` duplication needed — use `config-repo/`.
-- OAuth2 flows:
-  - Internal services → client credentials.
-  - Front-UI users → authorization code + PKCE.
-- Database schema initialization occurs automatically on container start.
-- Common enums and DTOs are located in `platform-contracts/`.
-- Notifications client starter and exception starter are shared libraries (`platform-*`).
+### **Blocker Service**
 
----
+-   Fraud and suspicious operations checker
+
+------------------------------------------------------------------------
+
+## Databases (PostgreSQL)
+
+Each microservice with persistence has its own database:
+
+-   `postgres-accounts`
+-   `postgres-cash`
+-   `postgres-transfer`
+-   `postgres-notifications`
+
+Each DB is deployed as a **StatefulSet**, migrations run via **Flyway**.
+
+------------------------------------------------------------------------
+
+## Kubernetes Deployment
+
+### Namespaces
+
+-   `dev`
+-   `test`
+-   `prod`
+
+Each with its own values, secrets, and configurations.
+
+### Ingress Routing
+
+  Path         Service
+  ------------ ------------------
+  `/ui/**`     front-ui-service
+  `/auth/**`   auth-service
+
+Internal backend APIs resolve via DNS:
+
+    http://accounts:8080
+    http://cash:8080
+    http://transfer:8080
+    http://notifications:8080
+    http://exchange:8080
+    http://blocker:8080
+
+### Shared Infrastructure
+
+-   Ingress controller: **ingress-nginx**
+-   Registry secret: **regcred**
+-   Helm library chart: **service-template**
+
+------------------------------------------------------------------------
+
+## Configuration Management
+
+### Secrets
+
+Environment variables stored in Kubernetes Secrets: - `POSTGRES_USER`,
+`POSTGRES_PASSWORD` - `OAUTH2_CLIENT_ID`, `OAUTH2_CLIENT_SECRET` -
+`SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ISSUER_URI` -
+`SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI`
+
+### ConfigMaps (Examples)
+
+#### Exchange Service
+
+-   `EXCHANGE_SCALE`
+-   `EXCHANGE_ROUNDING_MODE`
+-   `EXCHANGE_SUPPORTED`
+
+#### Blocker Service
+
+-   `BLOCKER_THRESHOLD`
+-   `BLOCKER_DENY_PERCENT`
+
+#### Exchange-Generation
+
+-   `EXGEN_SUPPORTED`
+-   `EXGEN_FIXED_RATE_MS`
+-   `EXGEN_DRIFT_PCT`
+-   `EXGEN_EXCHANGE_SERVICE_ID`
+-   `INITIAL_TO_RUB_USD`
+-   `INITIAL_TO_RUB_CNY`
+
+------------------------------------------------------------------------
+
+## Helm Charts
+
+### Directory Structure
+
+    charts/
+      umbrella/
+      accounts/
+      auth/
+      cash/
+      transfer/
+      notifications/
+      exchange/
+      exchange-generator/
+      blocker/
+      front-ui/
+      _service-template/
+
+### Umbrella Deployment
+
+    helm upgrade --install bank-app-dev charts/umbrella   -n dev   -f charts/umbrella/values-dev.yaml
+
+### Helm Tests
+
+    helm test <release> -n <namespace>
+
+------------------------------------------------------------------------
+
+## CI/CD Pipeline (Jenkins)
+
+### Pipeline Steps
+
+1.  Checkout Git repository\
+2.  Maven build & unit tests\
+3.  Docker build for microservices\
+4.  Push images to registry\
+5.  Deploy via Helm to `dev/test/prod`\
+6.  Run Helm tests
+
+### Credentials
+
+-   Docker Hub: `dockerhub-creds`
+-   Kubernetes: kubeconfig available on Jenkins node
+
+------------------------------------------------------------------------
 
 ## Testing
 
-- **Unit / Integration**: JUnit 5 + Spring Boot Test.  
-- **Containers**: PostgreSQL via Testcontainers (per service).  
-- **E2E tests** (optional): can validate flows via Gateway using generated tokens.  
-- Run all tests:
-  ```bash
-  mvn test
-  ```
+### Unit & Integration tests
+
+-   JUnit 5\
+-   Spring Boot Test\
+-   Flyway migrations validated automatically
+
+### Helm Tests
+
+    helm test <release> -n dev
+
+------------------------------------------------------------------------
+
+## Local Development (Docker Compose)
+
+Legacy local mode:
+
+    docker compose up -d
+
+### Access:
+
+-   Front-UI → http://localhost:8088\
+-   Auth → http://localhost:8080\
+-   PostgreSQL → localhost:5432
+
+------------------------------------------------------------------------
+
+## How to Deploy to Minikube
+
+### 1. Start Minikube
+
+``` bash
+minikube start --memory=6g --cpus=4
+```
+
+### 2. Install Ingress-NGINX
+
+``` bash
+minikube addons enable ingress
+```
+
+### 3. Create namespaces
+
+``` bash
+kubectl create ns dev
+kubectl create ns test
+kubectl create ns prod
+```
+
+### 4. Create registry secret
+
+``` bash
+kubectl create secret docker-registry regcred ...
+```
+
+### 5. Deploy PostgreSQL StatefulSets
+
+### 6. Build & push Docker images
+
+### 7. Deploy umbrella chart
+
+``` bash
+helm upgrade --install bank-app-dev charts/umbrella -n dev
+```
+
+### 8. Run tests
+
+``` bash
+helm test bank-app-dev -n dev
+```
+
+------------------------------------------------------------------------

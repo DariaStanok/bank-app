@@ -1,0 +1,5 @@
+﻿apiVersion: v2
+name: infra-registry
+description: Creates imagePullSecret for private registry in a namespace
+type: application
+version: 0.1.0

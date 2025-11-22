@@ -1,0 +1,15 @@
+image:
+  repository: postgres
+  tag: "15"
+  pullPolicy: IfNotPresent
+
+postgres:
+  db: bank
+  user: "user"
+  password: "password"
+
+storage:
+  size: 1Gi
+
+service:
+  port: 5432

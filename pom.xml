@@ -5,7 +5,7 @@
 
 	<groupId>ru.practicum</groupId>
 	<artifactId>bank-app</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>bank-app</name>
 
@@ -17,42 +17,34 @@
 	</parent>
 
 	<modules>
-		<module>config-server</module>
-		<module>discovery-service</module>
-		<module>api-gateway</module>
 		<module>auth-service</module>
 		<module>accounts-service</module>
 		<module>cash-service</module>
 		<module>transfer-service</module>
 		<module>notifications-service</module>
 		<module>front-ui-service</module>
-		<!-- <module>blocker-service</module> -->
-		<!-- <module>exchange-service</module> -->
-		<!-- <module>exchange-generation-service</module> -->
+		<module>blocker-service</module>
+		<module>exchange-service</module>
+		<module>exchange-generation-service</module>
 		<module>platform-contracts</module>
 		<module>platform-notifications-client-starter</module>
 		<module>platform-web-exception-starter</module>
+		<module>platform-http-client-starter</module>
+		<module>platform-security-starter</module>
 	</modules>
 
 	<properties>
 		<java.version>21</java.version>
-		<spring-cloud.version>2023.0.3</spring-cloud.version>
 		<springdoc.version>2.6.0</springdoc.version>
+		<testcontainers.version>1.20.2</testcontainers.version>
 		<restassured.version>5.5.0</restassured.version>
 		<wiremock.version>3.9.1</wiremock.version>
+		<flyway.version>10.20.1</flyway.version>
+		<resilience4j.version>2.2.0</resilience4j.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- Spring Cloud BOM -->
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
 			<!-- Tests dependencies -->
 			<dependency>
 				<groupId>org.testcontainers</groupId>
@@ -60,6 +52,18 @@
 				<version>${testcontainers.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-core</artifactId>
+				<version>${flyway.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.github.resilience4j</groupId>
+				<artifactId>resilience4j-spring-boot3</artifactId>
+				<version>${resilience4j.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>ru.practicum</groupId>
 		<artifactId>bank-app</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>transfer-service</artifactId>
@@ -39,23 +39,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-
-		<!-- Eureka Client  -->
+		
+		<!-- Resilience4j без Spring Cloud -->
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-		</dependency>
-
-		<!-- Config Client -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-		</dependency>
-
-		<!-- Circuit Breaker -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-spring-boot3</artifactId>
 		</dependency>
 
 		<!-- OpenAPI/Swagger UI  -->
@@ -65,24 +53,30 @@
 			<version>${springdoc.version}</version>
 		</dependency>
 
-		<!-- Notifications starter  -->
+		<!-- Internal starters / contracts -->
 		<dependency>
 			<groupId>ru.practicum</groupId>
 			<artifactId>platform-notifications-client-starter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<!-- Web Exception starter  -->
 		<dependency>
 			<groupId>ru.practicum</groupId>
 			<artifactId>platform-web-exception-starter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
-        <!-- Transfer contracts  -->
 		<dependency>
 			<groupId>ru.practicum</groupId>
 			<artifactId>platform-contracts</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ru.practicum</groupId>
+			<artifactId>platform-http-client-starter</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ru.practicum</groupId>
+			<artifactId>platform-security-starter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -91,6 +85,10 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
 		</dependency>
 
 		<!-- Lombok  -->
@@ -112,23 +110,6 @@
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>3.2.0</version>
-		</dependency>
-
-		<!-- OAuth2 Authorization -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-client</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-		</dependency>
-		
-		<!-- Security  -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
 		<!-- Тесты -->

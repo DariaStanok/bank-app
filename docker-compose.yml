@@ -8,8 +8,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
-    volumes:
-      - ./init:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
@@ -17,197 +15,151 @@ services:
       retries: 20
     restart: unless-stopped
 
-  discovery-service:
-    container_name: discovery-service
-    build:
-      context: .
-      dockerfile: ./discovery-service/Dockerfile
-    ports:
-    - "8761:8761"
-    environment:
-     SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-    restart: unless-stopped
-
-  config-server:
-   container_name: config-server
-   build:
-      context: .
-      dockerfile: ./config-server/Dockerfile 
-   ports:
-    - "8888:8888" 
-   volumes:
-    - ./config-repo:/config-repo:ro
-   environment:
-     SPRING_PROFILES_ACTIVE: native
-     SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS: file:/config-repo
-   restart: unless-stopped
-
-  api-gateway:
-    container_name: api-gateway
-    build:
-      context: .       
-      dockerfile: ./api-gateway/Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
-      GATEWAY_CLIENT_SECRET: ${GATEWAY_CLIENT_SECRET}
-    depends_on:
-      - config-server
-      - discovery-service
-      - auth-service
-    restart: unless-stopped
-
-  accounts-service:
-    container_name: accounts-service
-    build:
-      context: .
-      dockerfile: ./accounts-service/Dockerfile
-    expose:
-    - "8080"
-    environment:
-      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    depends_on:
-      - config-server
-      - discovery-service
-    restart: unless-stopped  
-
-  cash-service:
-    container_name: cash-service
-    build:
-      context: .
-      dockerfile: ./cash-service/Dockerfile
-    expose:
-      - "8080"
-    environment:
-      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    depends_on:
-      - config-server
-      - discovery-service
-    restart: unless-stopped 
-
-  transfer-service:
-    container_name: transfer-service
-    build:
-      context: .
-      dockerfile: ./transfer-service/Dockerfile
-    expose:
-      - "8080"
-    environment:
-      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    depends_on:
-      - config-server
-      - discovery-service
-    restart: unless-stopped  
-
-  notifications-service:
-    container_name: notifications-service
-    build:
-      context: .
-      dockerfile: ./notifications-service/Dockerfile
-    expose:
-      - "8080"
-    environment:
-      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    depends_on:
-      - config-server
-      - discovery-service
-    restart: unless-stopped  
-
-  front-ui-service:
-    container_name: front-ui-service
-    build:
-      context: .
-      dockerfile: ./front-ui-service/Dockerfile
-    ports:
-    - "8088:8080"    
-    environment:
-     SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
-    depends_on:
-    - discovery-service
-    - config-server
-    restart: unless-stopped
-    
   auth-service:
     container_name: auth-service
+    image: docker.io/dariaku/auth-service:v2
     build:
       context: .
       dockerfile: ./auth-service/Dockerfile
     expose:
       - "8080"
     environment:
-      SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    depends_on:
-      - config-server
-      - discovery-service
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ISSUER_URI: "http://auth-service:8080/auth"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
     restart: unless-stopped
 
-  # blocker-service:
+  accounts-service:
+    container_name: accounts-service
+    image: docker.io/dariaku/accounts-service:v2
+    build:
+      context: .
+      dockerfile: ./accounts-service/Dockerfile
+    expose:
+      - "8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/bank?currentSchema=accounts"
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth-service:8080/auth"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    restart: unless-stopped  
 
-  #   build:
-  #     context: ./blocker-service
-  #     dockerfile: Dockerfile
-  #   container_name: blocker-service
-  #   expose:
-  #     - "8080"
-  #   environment:
-  #     SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #   depends_on:
-  #     - discovery-service
-  #     - config-server
-  #   restart: unless-stopped
+  cash-service:
+    container_name: cash-service
+    image: docker.io/dariaku/cash-service:v2
+    build:
+      context: .
+      dockerfile: ./cash-service/Dockerfile
+    expose:
+      - "8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/bank?currentSchema=cash"
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth-service:8080/auth"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    restart: unless-stopped 
 
-  # exchange-service:
-  #   build:
-  #     context: ./exchange-service
-  #     dockerfile: Dockerfile
-  #   container_name: exchange-service
-  #   expose:
-  #     - "8080"
-  #   environment:
-  #     SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #   depends_on:
-  #     - discovery-service
-  #     - config-server
-   #   restart: unless-stopped
+  transfer-service:
+    container_name: transfer-service
+    image: docker.io/dariaku/transfer-service:v2
+    build:
+      context: .
+      dockerfile: ./transfer-service/Dockerfile
+    expose:
+      - "8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/bank?currentSchema=transfer"
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth-service:8080/auth"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    restart: unless-stopped  
 
-  # exchange-generation-service:
-  #   build:
-  #     context: ./exchange-generation-service
-  #     dockerfile: Dockerfile
-  #   container_name: exchange-generation-service
-  #   expose:
-  #     - "8080"
-  #   environment:
-  #     SPRING_CLOUD_CONFIG_URI: http://config-server:8888
-  #     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-service:8761/eureka
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #   depends_on:
-  #     - discovery-service
-  #     - config-server   
-  #   restart: unless-stopped 
+  notifications-service:
+    container_name: notifications-service
+    image: docker.io/dariaku/notifications-service:v2
+    build:
+      context: .
+      dockerfile: ./notifications-service/Dockerfile
+    expose:
+      - "8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/bank?currentSchema=notifications"
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth-service:8080/auth"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    restart: unless-stopped  
 
+  front-ui-service:
+    container_name: front-ui
+    image: docker.io/dariaku/front-ui:v2
+    build:
+      context: .
+      dockerfile: ./front-ui-service/Dockerfile
+    ports:
+      - "8088:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_FRONT_UI_ISSUER_URI: "http://auth-service:8080/auth"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    restart: unless-stopped
+
+  blocker-service:
+    container_name: blocker-service
+    image: docker.io/dariaku/blocker-service:v2
+    build:
+      context: .
+      dockerfile: ./blocker-service/Dockerfile
+    expose:
+      - "8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth-service:8080/auth"
+      BLOCKER_THRESHOLD: "10000.00"
+      BLOCKER_DENY_PERCENT: "5"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    restart: unless-stopped
+
+  exchange-service:
+    container_name: exchange-service
+    image: docker.io/dariaku/exchange-service:v2
+    build:
+      context: .
+      dockerfile: ./exchange-service/Dockerfile
+    expose:
+      - "8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth-service:8080/auth"
+      EXCHANGE_SCALE: "6"
+      EXCHANGE_ROUNDING_MODE: "HALF_UP"
+      EXCHANGE_SUPPORTED: "RUB,USD,CNY"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    restart: unless-stopped
+
+  exchange-generation-service:
+    container_name: exchange-generator
+    image: docker.io/dariaku/exchange-generator:v2
+    build:
+      context: .
+      dockerfile: ./exchange-generation-service/Dockerfile
+    expose:
+      - "8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth-service:8080/auth"
+      EXGEN_SUPPORTED: "USD,CNY"
+      EXGEN_FIXED_RATE_MS: "60000"
+      EXGEN_DRIFT_PCT: "5"
+      EXGEN_EXCHANGE_SERVICE_ID: "exchange-service"
+      INITIAL_TO_RUB_USD: "90.0"
+      INITIAL_TO_RUB_CNY: "12.0"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+    restart: unless-stopped

@@ -1,0 +1,41 @@
+﻿image:
+  repository: ""          
+  tag: "latest"          
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+containerPort: 8080
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 8080
+
+env: {}             
+imagePullSecrets: []   
+
+config:
+  enabled: false
+  data: {}
+
+secret:
+  enabled: false
+  data: {}
+
+ingress:
+  enabled: false
+  className: nginx
+  hosts: []               
+  tls: []                 
+
+probes:
+  liveness:
+    enabled: true
+    path: /actuator/health/liveness
+    initialDelaySeconds: 20
+    periodSeconds: 10
+  readiness:
+    enabled: true
+    path: /actuator/health/readiness
+    initialDelaySeconds: 10
+    periodSeconds: 5

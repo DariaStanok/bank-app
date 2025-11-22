@@ -1,5 +1,3 @@
-# VCS
-.git
 
 # IDE
 .idea
@@ -21,4 +19,17 @@
 .DS_Store
 Thumbs.db
 
-!.mvn/wrapper/maven-wrapper.jar
+charts/*/charts/
+charts/*/Chart.lock.backup
+
+k8s/infra/registry/values-dev.yaml
+k8s/infra/registry/values-test.yaml
+k8s/infra/registry/values-prod.yaml
+
+
+env/dev/*-secrets.yaml
+env/test/*-secrets.yaml
+env/prod/*-secrets.yaml
+
+jenkins_home/
+

@@ -1,9 +1,0 @@
-exgen:
-  supported: [RUB, USD, CNY]     
-  fixed-rate-ms: 1000            
-  drift-pct: 0.005               )
-  exchange-service-id: exchange-service  
-
-  initial-to-rub:               
-    USD: 96.10
-    CNY: 13.20

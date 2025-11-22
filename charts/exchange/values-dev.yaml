@@ -1,0 +1,19 @@
+﻿image:
+  repository: docker.io/dariaku/exchange-service   
+  tag: dev
+
+env:
+  SPRING_PROFILES_ACTIVE: dev
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth:8080/auth"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+
+config:
+  enabled: true
+  data:
+    EXCHANGE_SCALE: "6"
+    EXCHANGE_ROUNDING_MODE: "HALF_UP"
+    EXCHANGE_SUPPORTED: "RUB,USD,CNY"
+
+clients: {}          
+ingress:
+  enabled: false

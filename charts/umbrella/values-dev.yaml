@@ -1,0 +1,43 @@
+﻿infra:
+  namespaces:
+    enabled: true
+    
+front-ui: 
+  image:
+    repository: docker.io/dariaku/front-ui
+    tag: v2
+
+accounts: 
+  image:
+    repository: docker.io/dariaku/accounts-service
+    tag: v2
+
+cash: 
+  image:
+    repository: docker.io/dariaku/cash-service
+    tag: v2
+
+transfer: 
+  image:
+    repository: docker.io/dariaku/transfer-service
+    tag: v2
+
+notifications: 
+  image:
+    repository: docker.io/dariaku/notifications-service
+    tag: v2
+
+blocker: 
+  image:
+    repository: docker.io/dariaku/blocker-service
+    tag: v2
+
+exchange: 
+  image:
+    repository: docker.io/dariaku/exchange-service
+    tag: v2
+
+exchange-generator:
+  image:
+    repository: docker.io/dariaku/exchange-generator
+    tag: v2

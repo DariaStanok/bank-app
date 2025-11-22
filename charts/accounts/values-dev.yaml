@@ -1,0 +1,14 @@
+﻿image:
+  repository: docker.io/dariaku/accounts-service  
+
+env:
+  SPRING_PROFILES_ACTIVE: dev
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-accounts.dev.svc.cluster.local:5432/bank?currentSchema=accounts"
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth:8080/auth"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+
+clients:
+  notifications: { baseUrl: "http://notifications:8080" }
+
+ingress:
+  enabled: false

@@ -1,0 +1,18 @@
+{{- define "service-template.tests" -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "service-template.fullname" . }}-test-connection"
+  labels:
+    {{- include "service-template.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: curl
+      image: curlimages/curl:8.7.1
+      args:
+        - -f
+        - "http://{{ include "service-template.fullname" . }}:{{ .Values.service.port | default 8080 }}/actuator/health"
+  restartPolicy: Never
+{{- end }}
