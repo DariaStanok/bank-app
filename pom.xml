@@ -31,6 +31,7 @@
 		<module>platform-web-exception-starter</module>
 		<module>platform-http-client-starter</module>
 		<module>platform-security-starter</module>
+		<module>platform-kafka-starter</module>
 	</modules>
 
 	<properties>
