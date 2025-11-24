@@ -13,5 +13,6 @@ public class KafkaProperties {
     private String bootstrapServers;
     private String notificationsTopic;
     private String exchangeRatesTopic;
+    private String consumerGroupId;
 
 }

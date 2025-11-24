@@ -9,18 +9,15 @@ env:
   APP_KAFKA_BOOTSTRAP_SERVERS: ""
   APP_KAFKA_EXCHANGE_RATES_TOPIC: ""
 
+
 config:
   enabled: true
   data:
     EXGEN_SUPPORTED: "USD,CNY"
     EXGEN_FIXED_RATE_MS: "60000"
-    EXGEN_DRIFT_PCT: "5"
-    EXGEN_EXCHANGE_SERVICE_ID: "exchange-generator"   
+    EXGEN_DRIFT_PCT: "5"   
     INITIAL_TO_RUB_USD: "90.0"
-    INITIAL_TO_RUB_CNY: "12.0"
-    
-clients:
-  exchange:      { baseUrl: "http://exchange:8080" }
+    INITIAL_TO_RUB_CNY: "12.0"    
 
 ingress:
   enabled: false

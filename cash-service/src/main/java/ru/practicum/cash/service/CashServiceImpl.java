@@ -14,7 +14,7 @@ import ru.practicum.cash.integration.AccountsClient;
 import ru.practicum.cash.integration.BlockerClient;
 import ru.practicum.cash.model.CashOperation;
 import ru.practicum.cash.repository.CashOperationRepository;
-import ru.practicum.client.NotificationsClient;
+import ru.practicum.kafka.starter.NotificationProducer;
 import ru.practicum.platform.contracts.accounts.AccountView;
 import ru.practicum.platform.contracts.accounts.BalanceChangeDto;
 import ru.practicum.platform.contracts.accounts.NewBalanceDto;
@@ -25,7 +25,7 @@ import ru.practicum.platform.contracts.cash.CashOperationViewDto;
 import ru.practicum.platform.contracts.enums.CashOpStatus;
 import ru.practicum.platform.contracts.enums.NotificationEvent;
 import ru.practicum.platform.contracts.enums.OperationType;
-import ru.practicum.platform.contracts.notifications.SendNotificationRequest;
+import ru.practicum.platform.contracts.notifications.NotificationMessageDto;
 import ru.practicum.web.exception.BadRequestException;
 import ru.practicum.web.exception.ConflictException;
 import ru.practicum.web.exception.NotFoundException;
@@ -37,7 +37,7 @@ public class CashServiceImpl implements CashService {
     private final CashOperationRepository operations;
     private final AccountsClient accounts;
     private final BlockerClient blocker;  
-    private final NotificationsClient notifications;
+    private final NotificationProducer notificationProducer;
     private final ModelMapper mapper;
 
     @Override 
@@ -134,13 +134,17 @@ public class CashServiceImpl implements CashService {
                 " from account " + acc.id();
         default -> "Cash operation: " + op.getId();
     };
-    notifications.send(new SendNotificationRequest(
-    		event,
-    		op.getId(),
-    		null,
-    		msg,
-    		Instant.now()
-    ));
+    
+    notificationProducer.send(
+            NotificationMessageDto.builder()
+                    .event(event)
+                    .userId(null)
+                    .accountId(acc.id())
+                    .operationId(op.getId())
+                    .message(msg)
+                    .at(Instant.now())
+                    .build()
+    );
   
     }
 

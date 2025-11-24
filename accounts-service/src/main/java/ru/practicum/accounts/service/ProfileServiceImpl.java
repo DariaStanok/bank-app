@@ -14,12 +14,12 @@ import ru.practicum.accounts.model.Account;
 import ru.practicum.accounts.model.UserAccount;
 import ru.practicum.accounts.repository.AccountRepository;
 import ru.practicum.accounts.repository.UserAccountRepository;
-import ru.practicum.client.NotificationsClient;
+import ru.practicum.kafka.starter.NotificationProducer;
 import ru.practicum.platform.contracts.accounts.ChangePasswordDto;
 import ru.practicum.platform.contracts.accounts.UpdateUserAccount;
 import ru.practicum.platform.contracts.accounts.UserDto;
 import ru.practicum.platform.contracts.enums.NotificationEvent;
-import ru.practicum.platform.contracts.notifications.SendNotificationRequest;
+import ru.practicum.platform.contracts.notifications.NotificationMessageDto;
 import ru.practicum.web.exception.BadRequestException;
 import ru.practicum.web.exception.NotFoundException;
 
@@ -31,7 +31,7 @@ public class ProfileServiceImpl implements ProfileService {
     private final AccountRepository accounts;
     private final PasswordEncoder encoder;
     private final ModelMapper mapper;
-    private final NotificationsClient notifications;
+    private final NotificationProducer notificationProducer;
 
     @Override
     @Transactional(readOnly = true)
@@ -53,13 +53,14 @@ public class ProfileServiceImpl implements ProfileService {
 
         users.save(user);
 
-        notifications.send(new SendNotificationRequest(
-                NotificationEvent.USER_UPDATED,
-                null,
-                user.getId(),
-                "Profile updated",
-                Instant.now()
-        ));
+        notificationProducer.send(
+                NotificationMessageDto.builder()
+                        .event(NotificationEvent.USER_UPDATED)
+                        .userId(user.getId())
+                        .message("Profile updated")
+                        .at(Instant.now())
+                        .build()
+          );              
 
         return mapper.map(user, UserDto.class);
     }
@@ -79,13 +80,14 @@ public class ProfileServiceImpl implements ProfileService {
         user.setPasswordHash(encoder.encode(dto.newPassword()));
         users.save(user);
 
-        notifications.send(new SendNotificationRequest(
-                NotificationEvent.USER_PASSWORD_CHANGED,
-                null,
-                user.getId(),
-                "Password changed",
-                Instant.now()
-        ));
+        notificationProducer.send(
+                NotificationMessageDto.builder()
+                        .event(NotificationEvent.USER_PASSWORD_CHANGED)
+                        .userId(user.getId())
+                        .message("Password changed")
+                        .at(Instant.now())
+                        .build()
+        );
     }
 
     @Override
