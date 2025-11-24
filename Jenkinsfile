@@ -8,10 +8,10 @@ pipeline {
     environment {
         DOCKERHUB_REPO   = 'dariaku'
         DOCKER_TAG       = 'v2'
-        DOCKER_DRY_RUN   = 'false'  
+        DOCKER_DRY_RUN   = 'false'
 
         K8S_NAMESPACE_DEV = 'dev'
-        HELM_DRY_RUN      = 'true' 
+        HELM_DRY_RUN      = 'true'
     }
 
     stages {
@@ -102,14 +102,32 @@ pipeline {
             }
         }
 
+        stage('Deploy Kafka (dev)') {
+            steps {
+                ansiColor('xterm') {
+                    script {
+                        if (env.HELM_DRY_RUN == 'true') {
+                            echo "DRY RUN (helm): helm dependency update charts/infra-kafka"
+                            echo "DRY RUN (helm): helm upgrade --install infra-kafka charts/infra-kafka -n ${K8S_NAMESPACE_DEV} --dry-run --debug"
+                        } else {
+                            sh """
+                              helm dependency update charts/infra-kafka
+                              helm upgrade --install infra-kafka charts/infra-kafka -n ${K8S_NAMESPACE_DEV}
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Deploy to dev (Helm)') {
             steps {
                 ansiColor('xterm') {
                     script {
                         if (env.HELM_DRY_RUN == 'true') {
                             echo "DRY RUN (helm, not executed in Jenkins): " +
-                                    "helm upgrade --install bank-app-dev charts/umbrella " +
-                                    "-n ${K8S_NAMESPACE_DEV} -f charts/umbrella/values-dev.yaml --dry-run --debug"
+                                 "helm upgrade --install bank-app-dev charts/umbrella " +
+                                 "-n ${K8S_NAMESPACE_DEV} -f charts/umbrella/values-dev.yaml --dry-run --debug"
                         } else {
                             sh """
                                 helm upgrade --install bank-app-dev charts/umbrella \\
@@ -121,8 +139,8 @@ pipeline {
                 }
             }
         }
-    }       
-    
+    }
+
     post {
         always {
             echo 'Pipeline finished (success or fail)'
