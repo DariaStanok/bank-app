@@ -111,7 +111,7 @@ Thymeleaf-based UI: - Login / Logout\
   **bank.exchange-rates**   FX rate updates      Exchange-Generator   Exchange
   -----------------------------------------------------------------------------------
 
-### ✔ Shared Kafka ENV variables
+### Shared Kafka ENV variables
 
     APP_KAFKA_BOOTSTRAP_SERVERS=infra-kafka.default.svc.cluster.local:9092
     APP_KAFKA_CONSUMER_GROUP_ID=<service-specific>
