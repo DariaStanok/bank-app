@@ -1,15 +1,21 @@
-# Bank-App v2.0 --- Kubernetes-Native Microservice Banking System
+# Kubernetes-Native Microservice Banking System with Apache Kafka
 
-Bank-App v2.0 is a modular microservice banking platform implemented
-with **Java 21**, **Spring Boot 3.3.3**, and **Spring Security 6**,
-fully migrated to a **Kubernetes-native infrastructure** using Helm,
-Ingress-NGINX, ConfigMaps/Secrets, StatefulSets, and CI/CD via Jenkins.
+**Bank-App v3.0**
 
-Each service is packaged as an **executable JAR** and deployed as a
-**Kubernetes Deployment**.\
-Service-to-service communication uses **REST + OAuth2 client-credentials
-flow**.\
-All persistent storage is provided by **PostgreSQL StatefulSets**.
+Bank-App v3.0 is a production-grade microservice banking platform built
+with\
+**Java 21**, **Spring Boot 3.3.3**, **Spring Security 6**, fully adapted
+for\
+**Kubernetes-native** deployment and extended with two Apache Kafka
+streams:
+
+-   **bank.notifications** --- system notification events\
+-   **bank.exchange-rates** --- real-time FX rate updates
+
+Each microservice is packaged as an **executable JAR**, deployed as a\
+**Kubernetes Deployment**, and uses **PostgreSQL StatefulSets**,
+**Ingress-NGINX**,\
+**Helm**, **Kafka**, and **Jenkins CI/CD**.
 
 ------------------------------------------------------------------------
 
@@ -17,85 +23,113 @@ All persistent storage is provided by **PostgreSQL StatefulSets**.
 
 ### Key Features
 
--   Kubernetes workloads managed via **Helm** (umbrella chart +
-    per-service charts)
--   Service discovery handled by **Kubernetes Services** (DNS names:
-    `accounts`, `cash`, etc.)
--   **Ingress-NGINX** serves as the API Gateway
--   External configuration via **ConfigMaps** and **Secrets**
--   Built-in **OAuth2 Authorization Server**
--   Fully automated CI/CD pipeline using **Jenkins**
-
-### Removed Components from v1.0
-
-The following are **no longer used**: - Spring Cloud Config Server\
-- Eureka Discovery Service\
-- Spring Cloud Gateway\
-- Consul / ZooKeeper
-
-All their responsibilities are now handled by **native Kubernetes
-features**.
+-   Pure **Kubernetes-native architecture**\
+    (no Spring Cloud Discovery / Gateway / Config Server)
+-   **Apache Kafka** as the transport for:
+    -   Notifications (Accounts / Cash / Transfer → Notifications)
+    -   FX rates (Exchange-Generator → Exchange)
+-   **Helm-based** deployment (umbrella chart + per-service charts)
+-   Fully automated **CI/CD via Jenkins**
+-   **OAuth2 Authorization** via dedicated Auth-Service
+-   **Isolated data stores**: PostgreSQL StatefulSet per service
 
 ------------------------------------------------------------------------
 
 ## Microservices Overview
 
-### **Auth Service**
+### Auth Service
 
 -   OAuth2 Authorization Server\
--   Supports Authorization Code & Client Credentials flows\
--   Issues JWT tokens for internal services and front-end users
+-   Client Credentials flow for internal services\
+-   Authorization Code flow for Front-UI\
+-   Issues JWT tokens
 
-### **Front-UI Service**
+### Front-UI Service
 
--   Spring MVC + Thymeleaf\
--   Provides UI for login, registration, dashboard, transfers
+Thymeleaf-based UI: - Login / Logout\
+- Dashboard\
+- Transfers\
+- Account settings
 
-### **Accounts Service**
+### Accounts Service
 
--   Manages user profiles\
--   Maintains bank accounts (per currency)\
--   Validates domain rules
+-   Users / Profiles / Accounts\
+-   CRUD with domain rules\
+-   Kafka producer (notifications)
 
-### **Cash Service**
+### Cash Service
 
--   Handles deposits and withdrawals\
--   Integrates with Accounts & Notifications
+-   Deposits / Withdrawals\
+-   Idempotency\
+-   Coordination with Accounts\
+-   Optional Blocker integration\
+-   Kafka producer (notifications)
 
-### **Transfer Service**
+### Transfer Service
 
--   Manages P2P transfers\
--   Uses Exchange, Blocker, and Notifications services\
--   Supports complex transactional logic
+-   Money transfers\
+-   FX conversion via Exchange\
+-   Blocker checks\
+-   Idempotency\
+-   Kafka producer (notifications)
 
-### **Notifications Service**
+### Notifications Service
 
--   Stores and retrieves system & user notifications
+-   Kafka consumer (`bank.notifications`)\
+-   Stores notifications in PostgreSQL\
+-   REST API to fetch recent notifications
 
-### **Exchange Service**
+### Exchange Service
 
--   Provides FX conversion rates
+-   FX conversion support\
+-   Kafka consumer (`bank.exchange-rates`)\
+-   Stores latest FX rates in memory
 
-### **Exchange-Generation Service**
+### Exchange-Generator Service
 
--   Periodically updates FX rates for Exchange Service
+-   Generates FX rates & volatility\
+-   Publishes updates every N milliseconds\
+-   Kafka producer (`bank.exchange-rates`)
 
-### **Blocker Service**
+### Blocker Service
 
--   Fraud and suspicious operations checker
+-   Anti-fraud / suspicious-operation checks\
+-   REST client invoked by Cash/Transfer
+
+------------------------------------------------------------------------
+
+## Kafka Integration
+
+### Topics
+
+  -----------------------------------------------------------------------------------
+  Topic                     Description          Producer(s)          Consumer(s)
+  ------------------------- -------------------- -------------------- ---------------
+  **bank.notifications**    system notifications Accounts, Cash,      Notifications
+                                                 Transfer             
+
+  **bank.exchange-rates**   FX rate updates      Exchange-Generator   Exchange
+  -----------------------------------------------------------------------------------
+
+### ✔ Shared Kafka ENV variables
+
+    APP_KAFKA_BOOTSTRAP_SERVERS=infra-kafka.default.svc.cluster.local:9092
+    APP_KAFKA_CONSUMER_GROUP_ID=<service-specific>
+    APP_KAFKA_NOTIFICATIONS_TOPIC=bank.notifications
+    APP_KAFKA_EXCHANGE_RATES_TOPIC=bank.exchange-rates
 
 ------------------------------------------------------------------------
 
 ## Databases (PostgreSQL)
 
-Each microservice with persistence has its own database:
+Each service uses a dedicated StatefulSet:
 
 -   `postgres-accounts`
 -   `postgres-cash`
 -   `postgres-transfer`
 -   `postgres-notifications`
 
-Each DB is deployed as a **StatefulSet**, migrations run via **Flyway**.
+Migrations are handled by **Flyway**.
 
 ------------------------------------------------------------------------
 
@@ -107,16 +141,14 @@ Each DB is deployed as a **StatefulSet**, migrations run via **Flyway**.
 -   `test`
 -   `prod`
 
-Each with its own values, secrets, and configurations.
-
 ### Ingress Routing
 
   Path         Service
-  ------------ ------------------
-  `/ui/**`     front-ui-service
+  ------------ --------------
+  `/ui/**`     front-ui
   `/auth/**`   auth-service
 
-Internal backend APIs resolve via DNS:
+Backend services accessible via DNS:
 
     http://accounts:8080
     http://cash:8080
@@ -125,11 +157,14 @@ Internal backend APIs resolve via DNS:
     http://exchange:8080
     http://blocker:8080
 
-### Shared Infrastructure
+------------------------------------------------------------------------
 
--   Ingress controller: **ingress-nginx**
--   Registry secret: **regcred**
--   Helm library chart: **service-template**
+## Shared Infrastructure
+
+-   **Ingress-NGINX**
+-   `regcred` --- Docker registry pull secret\
+-   **Helm library chart: `service-template`**
+-   **Kafka (Bitnami chart)**
 
 ------------------------------------------------------------------------
 
@@ -137,32 +172,26 @@ Internal backend APIs resolve via DNS:
 
 ### Secrets
 
-Environment variables stored in Kubernetes Secrets: - `POSTGRES_USER`,
-`POSTGRES_PASSWORD` - `OAUTH2_CLIENT_ID`, `OAUTH2_CLIENT_SECRET` -
-`SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ISSUER_URI` -
-`SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI`
+-   `OAUTH2_CLIENT_ID`, `OAUTH2_CLIENT_SECRET`
+-   PostgreSQL credentials
+-   Kafka Bootstrap servers
+-   `EXGEN_SEED_SECRET_BASE64` (FX generation seed)
 
-### ConfigMaps (Examples)
+### Example ConfigMaps
 
 #### Exchange Service
 
--   `EXCHANGE_SCALE`
--   `EXCHANGE_ROUNDING_MODE`
--   `EXCHANGE_SUPPORTED`
+    EXCHANGE_SCALE
+    EXCHANGE_ROUNDING_MODE
+    EXCHANGE_SUPPORTED
 
-#### Blocker Service
+#### Exchange-Generator
 
--   `BLOCKER_THRESHOLD`
--   `BLOCKER_DENY_PERCENT`
-
-#### Exchange-Generation
-
--   `EXGEN_SUPPORTED`
--   `EXGEN_FIXED_RATE_MS`
--   `EXGEN_DRIFT_PCT`
--   `EXGEN_EXCHANGE_SERVICE_ID`
--   `INITIAL_TO_RUB_USD`
--   `INITIAL_TO_RUB_CNY`
+    EXGEN_SUPPORTED
+    EXGEN_FIXED_RATE_MS
+    EXGEN_DRIFT_PCT
+    INITIAL_TO_RUB_USD
+    INITIAL_TO_RUB_CNY
 
 ------------------------------------------------------------------------
 
@@ -181,73 +210,81 @@ Environment variables stored in Kubernetes Secrets: - `POSTGRES_USER`,
       exchange-generator/
       blocker/
       front-ui/
+      infra-kafka/
       _service-template/
 
-### Umbrella Deployment
+### Deploy Umbrella
 
-    helm upgrade --install bank-app-dev charts/umbrella   -n dev   -f charts/umbrella/values-dev.yaml
-
-### Helm Tests
-
-    helm test <release> -n <namespace>
+``` bash
+helm upgrade --install bank-app-dev charts/umbrella \
+  -n dev \
+  -f charts/umbrella/values-dev.yaml
+```
 
 ------------------------------------------------------------------------
 
 ## CI/CD Pipeline (Jenkins)
 
-### Pipeline Steps
+### Stages
 
-1.  Checkout Git repository\
-2.  Maven build & unit tests\
-3.  Docker build for microservices\
-4.  Push images to registry\
-5.  Deploy via Helm to `dev/test/prod`\
-6.  Run Helm tests
+1.  Checkout\
+2.  Maven build\
+3.  Docker build for all services\
+4.  Docker push\
+5.  Helm deploy
+    -   Kafka\
+    -   Umbrella\
+6.  (Optional) Helm tests
 
-### Credentials
+### Required Credentials
 
--   Docker Hub: `dockerhub-creds`
--   Kubernetes: kubeconfig available on Jenkins node
+-   Docker Hub credentials\
+-   Kubeconfig\
+-   Optional GitHub token
 
 ------------------------------------------------------------------------
 
 ## Testing
 
-### Unit & Integration tests
+### Unit & Integration Tests
 
 -   JUnit 5\
 -   Spring Boot Test\
--   Flyway migrations validated automatically
+-   Flyway validation\
+-   WebTestClient / MockMvc\
+-   Optional: spring-kafka-test
 
 ### Helm Tests
 
-    helm test <release> -n dev
+``` bash
+helm test bank-app-dev -n dev
+```
 
 ------------------------------------------------------------------------
 
 ## Local Development (Docker Compose)
 
-Legacy local mode:
+Legacy (for development only):
 
-    docker compose up -d
+``` bash
+docker compose up -d
+```
 
-### Access:
-
--   Front-UI → http://localhost:8088\
--   Auth → http://localhost:8080\
--   PostgreSQL → localhost:5432
+Access: - Front-UI → http://localhost:8088\
+- Auth → http://localhost:8080\
+- PostgreSQL → localhost:5432
 
 ------------------------------------------------------------------------
 
-## How to Deploy to Minikube
+## Deployment to Minikube
 
-### 1. Start Minikube
+### 1. Start cluster
 
 ``` bash
 minikube start --memory=6g --cpus=4
 ```
 
-### 2. Install Ingress-NGINX
+### 2. Enable ingress
 
 ``` bash
 minikube addons enable ingress
@@ -261,17 +298,13 @@ kubectl create ns test
 kubectl create ns prod
 ```
 
-### 4. Create registry secret
+### 4. Add registry secret
 
 ``` bash
 kubectl create secret docker-registry regcred ...
 ```
 
-### 5. Deploy PostgreSQL StatefulSets
-
-### 6. Build & push Docker images
-
-### 7. Deploy umbrella chart
+### 5--7. Deploy PostgreSQL, build/push images, deploy umbrella
 
 ``` bash
 helm upgrade --install bank-app-dev charts/umbrella -n dev
@@ -282,5 +315,3 @@ helm upgrade --install bank-app-dev charts/umbrella -n dev
 ``` bash
 helm test bank-app-dev -n dev
 ```
-
-------------------------------------------------------------------------

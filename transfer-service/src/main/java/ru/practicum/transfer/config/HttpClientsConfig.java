@@ -26,7 +26,7 @@ public class HttpClientsConfig {
     }
 	
 	@Bean
-	 ExchangeClient exchange () {
+	ExchangeClient exchange () {
 		 return clientsRegistry.httpService("exchange generation service", ExchangeClient.class);
 	 }
 }

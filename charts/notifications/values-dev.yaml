@@ -8,9 +8,7 @@ env:
   MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
   APP_KAFKA_BOOTSTRAP_SERVERS: ""
   APP_KAFKA_NOTIFICATIONS_TOPIC: ""
-  APP_KAFKA_CONSUMER_GROUP_ID: ""
-
-clients: {}         
+  APP_KAFKA_CONSUMER_GROUP_ID: ""       
 
 ingress:
   enabled: false

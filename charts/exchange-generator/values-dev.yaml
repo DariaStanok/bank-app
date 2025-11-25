@@ -9,7 +9,6 @@ env:
   APP_KAFKA_BOOTSTRAP_SERVERS: ""
   APP_KAFKA_EXCHANGE_RATES_TOPIC: ""
 
-
 config:
   enabled: true
   data:
