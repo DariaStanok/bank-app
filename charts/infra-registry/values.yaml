@@ -1,0 +1,6 @@
+﻿registry:
+  server: ""      # адрес реестра: ghcr.io, index.docker.io, harbor.mycorp.local
+  username: ""    # логин
+  password: ""    # пароль/токен
+  email: ""      
+  secretName: regcred

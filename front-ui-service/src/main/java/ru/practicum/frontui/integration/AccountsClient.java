@@ -45,6 +45,6 @@ public interface AccountsClient {
 	void changePassword(@PathVariable Long userId, @RequestBody ChangePasswordDto dto);
 
 	@DeleteExchange("/api/v1/users/{userId}")
-	    void deleteUser(@PathVariable Long userId);
+	void deleteUser(@PathVariable Long userId);
 
 }

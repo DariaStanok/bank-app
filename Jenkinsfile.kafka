@@ -1,0 +1,23 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps { checkout scm }
+        }
+
+        stage('Deploy Kafka only') {
+            steps {
+                sh """
+                    helm dependency update charts/infra-kafka
+                    helm upgrade --install infra-kafka charts/infra-kafka -n default
+                """
+            }
+        }
+    }
+
+    post {
+        success { echo "Kafka deployed successfully" }
+        failure { echo "Kafka deploy failed" }
+    }
+}

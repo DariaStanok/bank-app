@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import ru.practicum.client.NotificationsClient;
+import ru.practicum.kafka.starter.NotificationProducer;
 import ru.practicum.platform.contracts.accounts.AccountView;
 import ru.practicum.platform.contracts.accounts.BalanceChangeDto;
 import ru.practicum.platform.contracts.blocker.BlockerCheckRequest;
@@ -17,7 +17,7 @@ import ru.practicum.platform.contracts.enums.Currency;
 import ru.practicum.platform.contracts.enums.NotificationEvent;
 import ru.practicum.platform.contracts.enums.OperationType;
 import ru.practicum.platform.contracts.enums.TransferStatus;
-import ru.practicum.platform.contracts.notifications.SendNotificationRequest;
+import ru.practicum.platform.contracts.notifications.NotificationMessageDto;
 import ru.practicum.platform.contracts.transfer.TransferDto;
 import ru.practicum.platform.contracts.transfer.TransferViewDto;
 import ru.practicum.transfer.config.TransferSettings;
@@ -38,7 +38,7 @@ public class TransferServiceImpl implements TransferService {
 
 	private final TransferRepository repository;
 	private final AccountsClient accounts;
-	private final NotificationsClient notifications;
+	private final NotificationProducer notificationProducer;
 	private final ModelMapper mapper;
 
 	private final TransferSettings settings;
@@ -203,12 +203,15 @@ public class TransferServiceImpl implements TransferService {
 	        default -> "Transfer operation: " + tx.getOperationId();
 	    };
 
-	    notifications.send(new SendNotificationRequest(
-	            event,
-	            tx.getOperationId(),  
-	            null,                 
-	            msg,                  
-	            Instant.now()        
-	    ));
+	    notificationProducer.send(
+	            NotificationMessageDto.builder()
+	                    .event(event)
+	                    .userId(null)                
+	                    .accountId(fromId)          
+	                    .operationId(tx.getOperationId())
+	                    .message(msg)
+	                    .at(Instant.now())
+	                    .build()
+	    );
 	} 
 }

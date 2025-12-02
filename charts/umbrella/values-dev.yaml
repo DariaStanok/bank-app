@@ -1,0 +1,59 @@
+﻿infra:
+  namespaces:
+    enabled: true
+    
+front-ui: 
+  image:
+    repository: docker.io/dariaku/front-ui
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+accounts: 
+  image:
+    repository: docker.io/dariaku/accounts-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+cash: 
+  image:
+    repository: docker.io/dariaku/cash-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+transfer: 
+  image:
+    repository: docker.io/dariaku/transfer-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+notifications: 
+  image:
+    repository: docker.io/dariaku/notifications-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+blocker: 
+  image:
+    repository: docker.io/dariaku/blocker-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+exchange: 
+  image:
+    repository: docker.io/dariaku/exchange-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+exchange-generator:
+  image:
+    repository: docker.io/dariaku/exchange-generator
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  

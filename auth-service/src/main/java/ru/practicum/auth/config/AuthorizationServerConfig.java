@@ -49,33 +49,85 @@ public class AuthorizationServerConfig {
 	
 	  @Bean
 	   RegisteredClientRepository registeredClientRepository() {
-	    RegisteredClient gatewayClient = RegisteredClient.withId(UUID.randomUUID().toString())
-	        .clientId("gateway-client")
-	        .clientSecret(passwordEncoder.encode("gateway-secret")) 
-	        .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-	        .scope("internal")
-	        .build();
+	    
+	    RegisteredClient transferClient = RegisteredClient.withId(UUID.randomUUID().toString())
+	            .clientId("transfer")
+	            .clientSecret(passwordEncoder.encode("transfer-secret"))
+	            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+	            .scope("internal")
+	            .build();
+	    
+	    RegisteredClient cashClient = RegisteredClient.withId(UUID.randomUUID().toString())
+	            .clientId("cash")
+	            .clientSecret(passwordEncoder.encode("cash-secret"))
+	            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+	            .scope("internal")
+	            .build();
+	    
+	    RegisteredClient notificationsClient = RegisteredClient.withId(UUID.randomUUID().toString())
+	            .clientId("notifications")
+	            .clientSecret(passwordEncoder.encode("notifications-secret"))
+	            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+	            .scope("internal")
+	            .build();
 	   
+	    RegisteredClient accountsClient = RegisteredClient.withId(UUID.randomUUID().toString())
+	            .clientId("accounts")
+	            .clientSecret(passwordEncoder.encode("accounts-secret"))
+	            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+	            .scope("internal")
+	            .build();
+	    
+	    RegisteredClient exchangeClient = RegisteredClient.withId(UUID.randomUUID().toString())
+	            .clientId("exchange")
+	            .clientSecret(passwordEncoder.encode("exchange-secret"))
+	            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+	            .scope("internal")
+	            .build();
+	    
+	    RegisteredClient generatorClient = RegisteredClient.withId(UUID.randomUUID().toString())
+	            .clientId("generator")
+	            .clientSecret(passwordEncoder.encode("generator-secret"))
+	            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+	            .scope("internal")
+	            .build();
+	    
+	    RegisteredClient blockerClient = RegisteredClient.withId(UUID.randomUUID().toString())
+	            .clientId("blocker")
+	            .clientSecret(passwordEncoder.encode("blocker-secret"))
+	            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+	            .scope("internal")
+	            .build();
 	  
 	  RegisteredClient frontUiClient = RegisteredClient.withId(UUID.randomUUID().toString())
-			    .clientId("front-ui-client")
-			    .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)    
+			  .clientId("front-ui")
+			    .clientSecret(passwordEncoder.encode("front-ui-secret"))
+			    .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 			    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-			    .redirectUri("http://localhost:8080/ui/login/oauth2/code/front-ui")
-			    .postLogoutRedirectUri("http://localhost:8080/ui/login")
 			    .redirectUri("http://localhost:8088/login/oauth2/code/front-ui")
 			    .postLogoutRedirectUri("http://localhost:8088/login")
+			    .redirectUri("http://dev.localhost/ui/login/oauth2/code/front-ui")
+			    .postLogoutRedirectUri("http://dev.localhost/ui/login")
 			    .scope(OidcScopes.OPENID)
 			    .scope(OidcScopes.PROFILE)
 			    .clientSettings(ClientSettings.builder()
-			        .requireProofKey(true)               
+			        .requireProofKey(false)               
 			        .requireAuthorizationConsent(false)   
 			        .build())
 			    .tokenSettings(TokenSettings.builder()
 			        .accessTokenTimeToLive(Duration.ofMinutes(10))
 			        .build())
 			    .build();
-	  return new InMemoryRegisteredClientRepository(gatewayClient, frontUiClient);
+	  return new InMemoryRegisteredClientRepository(
+			  frontUiClient, 
+			  transferClient, 
+			  cashClient, 
+			  notificationsClient,
+			  accountsClient,
+			  exchangeClient,
+			  generatorClient,
+			  blockerClient 
+		);
 	  }
 
 	  @Bean

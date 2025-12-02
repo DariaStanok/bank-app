@@ -1,4 +1,0 @@
-exchange:
-  scale: 6
-  rounding-mode: HALF_UP
-  supported: [RUB, USD, CNY]

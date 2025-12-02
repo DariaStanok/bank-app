@@ -1,0 +1,22 @@
+﻿image:
+  repository: docker.io/docker.io/dariaku/exchange-generator
+  tag: dev
+
+env:
+  SPRING_PROFILES_ACTIVE: dev
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth:8080/auth"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+  APP_KAFKA_BOOTSTRAP_SERVERS: ""
+  APP_KAFKA_EXCHANGE_RATES_TOPIC: ""
+
+config:
+  enabled: true
+  data:
+    EXGEN_SUPPORTED: "USD,CNY"
+    EXGEN_FIXED_RATE_MS: "60000"
+    EXGEN_DRIFT_PCT: "5"   
+    INITIAL_TO_RUB_USD: "90.0"
+    INITIAL_TO_RUB_CNY: "12.0"    
+
+ingress:
+  enabled: false
