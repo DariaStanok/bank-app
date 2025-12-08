@@ -13,7 +13,6 @@
     <packaging>jar</packaging>
     <name>platform-kafka-starter</name>
     <description>Kafka autoconfiguration starter</description>
-
     <dependencies>
         <dependency>
             <groupId>ru.practicum</groupId>
