@@ -1,0 +1,44 @@
+﻿replicaCount: 1
+
+image:
+  repository: "openzipkin/zipkin"
+  pullPolicy: IfNotPresent
+
+containerPort: 9411
+
+resources: {}
+
+clients: {}
+
+config:
+  enabled: true
+  data:
+    ZIPKIN_STORAGE_TYPE: "mem"
+    SERVER_PORT: "9411"
+
+secret:
+  enabled: false
+  data: {}
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 9411
+
+ingress:
+  enabled: false
+  className: nginx
+  hosts: []
+  tls: []
+
+probes:
+  liveness:
+    enabled: false   
+    path: /actuator/health/liveness
+    initialDelaySeconds: 20
+    periodSeconds: 10
+  readiness:
+    enabled: false
+    path: /actuator/health/readiness
+    initialDelaySeconds: 10
+    periodSeconds: 5

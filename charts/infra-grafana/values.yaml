@@ -1,0 +1,43 @@
+﻿replicaCount: 1
+
+image:
+  repository: "grafana/grafana"
+  tag: "11.1.0"
+  pullPolicy: IfNotPresent
+
+containerPort: 3000
+
+resources: {}
+
+clients: {}
+
+config:
+  enabled: false
+  data: {}
+
+secret:
+  enabled: false
+  data: {}
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: false
+  className: nginx
+  hosts: []
+  tls: []
+
+probes:
+  liveness:
+    enabled: false   
+    path: /api/health
+    initialDelaySeconds: 20
+    periodSeconds: 10
+  readiness:
+    enabled: false
+    path: /api/health
+    initialDelaySeconds: 10
+    periodSeconds: 5

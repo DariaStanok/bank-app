@@ -1,0 +1,11 @@
+﻿apiVersion: v2
+name: infra-elk
+description: ELK (Elasticsearch + Logstash + Kibana) stack for bank-app
+type: application
+version: 0.1.0
+
+
+dependencies:
+  - name: service-template
+    version: 0.1.0
+    repository: "file://../service-template"

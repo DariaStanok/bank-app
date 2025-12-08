@@ -1,4 +1,16 @@
 dependencies:
+- name: infra-zipkin
+  repository: file://../infra-zipkin
+  version: 0.1.0
+- name: infra-prometheus
+  repository: file://../infra-prometheus
+  version: 0.1.0
+- name: infra-grafana
+  repository: file://../infra-grafana
+  version: 0.1.0
+- name: infra-elk
+  repository: file://../infra-elk
+  version: 0.1.0
 - name: infra-namespaces
   repository: file://../infra-namespaces
   version: 0.1.0
@@ -26,5 +38,5 @@ dependencies:
 - name: exchange-generator
   repository: file://../exchange-generator
   version: 0.1.0
-digest: sha256:0faa4b3e94efd3ef120ca9a5281b88dfe30caf7ef002e58e63cd741a4d1ab167
-generated: "2025-11-18T12:07:00.2390013+02:00"
+digest: sha256:1916d000ccc7bb0f39c6807f2a5cdc4209d0291ff7dcd18d41a8acba3f026c1d
+generated: "2025-12-08T20:50:11.6141349+02:00"

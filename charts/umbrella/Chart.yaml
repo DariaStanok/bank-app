@@ -5,6 +5,26 @@ type: application
 version: 0.1.0
 
 dependencies:
+  - name: infra-zipkin 
+    version: 0.1.0 
+    repository: "file://../infra-zipkin" 
+    condition: infra.zipkin.enabled
+
+  - name: infra-prometheus
+    version: 0.1.0
+    repository: "file://../infra-prometheus"
+    condition: infra.prometheus.enabled
+
+  - name: infra-grafana
+    version: 0.1.0
+    repository: "file://../infra-grafana"
+    condition: infra.grafana.enabled
+
+  - name: infra-elk
+    version: 0.1.0
+    repository: "file://../infra-elk"
+    condition: infra.elk.enabled
+    
   - name: infra-namespaces
     version: 0.1.0
     repository: "file://../infra-namespaces"
