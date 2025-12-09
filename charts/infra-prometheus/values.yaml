@@ -42,3 +42,7 @@ probes:
     path: /actuator/health/readiness
     initialDelaySeconds: 10
     periodSeconds: 5
+
+prometheus:
+  scrapeInterval: 10s
+  evaluationInterval: 10s    

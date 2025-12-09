@@ -6,6 +6,12 @@ metadata:
   name: {{ include "service-template.fullname" . }}
   labels:
     {{- include "service-template.labels" . | nindent 4 }}
+  {{- if .Values.monitoring.enabled }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/actuator/prometheus"
+    prometheus.io/port: "{{ .Values.service.port | default 8080 }}"
+  {{- end }}
 spec:
   type: {{ .Values.service.type | default "ClusterIP" }}
   selector:

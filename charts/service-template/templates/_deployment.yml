@@ -44,19 +44,18 @@ spec:
             {{- end }}
             {{- end }}
 
-          {{- if .Values.config.enabled }}
           envFrom:
+          {{- if .Values.config.enabled }}
             - configMapRef:
                 name: {{ include "service-template.fullname" . }}-config
           {{- end }}
-
           {{- if .Values.secret.enabled }}
-          {{- if not .Values.config.enabled }}
-          envFrom:
-          {{- end }}
             - secretRef:
                 name: {{ include "service-template.fullname" . }}-secret
           {{- end }}
+            - configMapRef:
+                name: infra-config
+                optional: true
 
           {{- if .Values.probes.liveness.enabled }}
           livenessProbe:

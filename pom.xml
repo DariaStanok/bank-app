@@ -42,6 +42,9 @@
 		<wiremock.version>3.9.1</wiremock.version>
 		<flyway.version>10.20.1</flyway.version>
 		<resilience4j.version>2.2.0</resilience4j.version>
+		<micrometer.tracing.version>1.6.0</micrometer.tracing.version>
+		<zipkin.reporter.brave.version>3.5.1</zipkin.reporter.brave.version>
+		<micrometer-prometheus.version>1.13.0</micrometer-prometheus.version>
 	</properties>
 
 	<dependencyManagement>
@@ -66,6 +69,25 @@
 				<artifactId>resilience4j-spring-boot3</artifactId>
 				<version>${resilience4j.version}</version>
 			</dependency>
+			
+			<dependency>
+				<groupId>io.micrometer</groupId>
+				<artifactId>micrometer-tracing-bridge-brave</artifactId>
+				<version>${micrometer.tracing.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>io.zipkin.reporter2</groupId>
+				<artifactId>zipkin-reporter-brave</artifactId>
+				<version>${zipkin.reporter.brave.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>io.micrometer</groupId>
+				<artifactId>micrometer-registry-prometheus</artifactId>
+				<version>${micrometer-prometheus.version}</version>
+			</dependency>
+			
 		</dependencies>
 	</dependencyManagement>
 

@@ -1,0 +1,4 @@
+﻿config:
+  enabled: false              
+  name: infra-config          
+  data: {}                   
