@@ -61,6 +61,12 @@
 			<artifactId>zipkin-reporter-brave</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>ru.practicum</groupId>
+			<artifactId>platform-observability-starter</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<!-- PostgreSQL -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
