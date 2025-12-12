@@ -43,3 +43,7 @@ probes:
     path: /actuator/health/readiness
     initialDelaySeconds: 10
     periodSeconds: 5
+
+monitoring:
+  enabled: false
+  

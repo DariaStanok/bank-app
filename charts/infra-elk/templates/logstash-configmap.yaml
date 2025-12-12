@@ -1,0 +1,11 @@
+{{- if and .Values.logstash.enabled .Values.logstash.pipeline }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "infra-elk.fullname" . }}-logstash-pipeline
+  labels:
+    {{- include "infra-elk.labels" . | nindent 4 }}
+data:
+  logstash.conf: |-
+{{ .Values.logstash.pipeline | indent 4 }}
+{{- end }}

@@ -1,0 +1,29 @@
+{{- if and .Values.kibana.enabled .Values.kibana.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "infra-elk.fullname" . }}-kibana
+  labels:
+    {{- include "infra-elk.labels" . | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.kibana.ingress.className | default "nginx" }}
+  rules:
+    {{- range .Values.kibana.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path | quote }}
+            pathType: {{ .pathType | default "Prefix" }}
+            backend:
+              service:
+                name: {{ include "infra-elk.fullname" $ }}-kibana
+                port:
+                  number: {{ $.Values.kibana.port | default 5601 }}
+          {{- end }}
+    {{- end }}
+  {{- if .Values.kibana.ingress.tls }}
+  tls:
+    {{- toYaml .Values.kibana.ingress.tls | nindent 4 }}
+  {{- end }}
+{{- end }}

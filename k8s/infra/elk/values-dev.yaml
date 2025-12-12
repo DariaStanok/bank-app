@@ -1,0 +1,20 @@
+﻿elasticsearch:
+  storage:
+    size: 2Gi
+    storageClassName: ""
+
+  javaOpts: "-Xms512m -Xmx512m"
+
+logstash:
+  pipeline: |-
+    input {
+      beats { port => 5044 }
+    }
+    filter {
+    }
+    output {
+      elasticsearch {
+        hosts => ["http://{{ .Release.Name }}-infra-elk-elasticsearch:9200"]
+        index => "logs-%{+YYYY.MM.dd}"
+      }
+    }

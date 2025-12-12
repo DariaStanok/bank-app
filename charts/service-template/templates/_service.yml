@@ -6,7 +6,8 @@ metadata:
   name: {{ include "service-template.fullname" . }}
   labels:
     {{- include "service-template.labels" . | nindent 4 }}
-  {{- if .Values.monitoring.enabled }}
+{{- $monitoring := (default (dict "enabled" false) .Values.monitoring) -}}
+{{- if $monitoring.enabled }}
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/path: "/actuator/prometheus"

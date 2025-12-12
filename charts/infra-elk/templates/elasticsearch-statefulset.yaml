@@ -1,0 +1,58 @@
+{{- if .Values.elasticsearch.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "infra-elk.fullname" . }}-elasticsearch
+  labels:
+    {{- include "infra-elk.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "infra-elk.fullname" . }}-elasticsearch
+  replicas: {{ .Values.elasticsearch.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: elasticsearch
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{- include "infra-elk.labels" . | nindent 8 }}
+        app.kubernetes.io/component: elasticsearch
+    spec:
+      containers:
+        - name: elasticsearch
+          image: "{{ .Values.elasticsearch.image.repository }}:{{ .Values.elasticsearch.image.tag }}"
+          imagePullPolicy: {{ .Values.elasticsearch.image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.elasticsearch.port | default 9200 }}
+          env:
+            - name: discovery.type
+              value: "single-node"
+            - name: xpack.security.enabled
+              value: "false"
+            - name: ES_JAVA_OPTS
+              value: "{{ .Values.elasticsearch.javaOpts | default "-Xms512m -Xmx512m" }}"
+          {{- if .Values.elasticsearch.resources }}
+          resources:
+            {{- toYaml .Values.elasticsearch.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: es-data
+              mountPath: /usr/share/elasticsearch/data
+  {{- if .Values.elasticsearch.storage.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: es-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        {{- if .Values.elasticsearch.storage.storageClassName }}
+        storageClassName: {{ .Values.elasticsearch.storage.storageClassName | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.elasticsearch.storage.size | default "2Gi" }}
+  {{- else }}
+  volumeClaimTemplates: []
+  {{- end }}
+{{- end }}

@@ -3,8 +3,3 @@ name: infra-prometheus
 description: Prometheus monitoring for bank-app
 type: application
 version: 0.1.0
-
-dependencies:
-  - name: service-template
-    version: 0.1.0
-    repository: "file://../service-template"

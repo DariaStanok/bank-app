@@ -1,43 +1,42 @@
-﻿replicaCount: 1
-
-image:
-  repository: "sebp/elk"    
-  tag: "latest"          
-  pullPolicy: IfNotPresent
-
-containerPort: 5601
-
-resources: {}
-
-clients: {}
-
-config:
-  enabled: false
-  data: {}
-
-secret:
-  enabled: false
-  data: {}
-
-service:
+﻿elasticsearch:
   enabled: true
-  type: ClusterIP
+  image:
+    repository: "docker.elastic.co/elasticsearch/elasticsearch"
+    tag: "8.18.4"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 9200
+  resources: {}
+  storage:
+    enabled: true
+    size: 2Gi
+    storageClassName: ""
+  javaOpts: "-Xms512m -Xmx512m"
+
+logstash:
+  enabled: true
+  image:
+    repository: "docker.elastic.co/logstash/logstash"
+    tag: "8.18.4"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 5044
+  resources: {}
+  pipeline: ""  
+
+kibana:
+  enabled: true
+  image:
+    repository: "docker.elastic.co/kibana/kibana"
+    tag: "8.18.4"
+    pullPolicy: IfNotPresent
+  replicas: 1
   port: 5601
-
-ingress:
-  enabled: false
-  className: nginx
-  hosts: []
-  tls: []
-
-probes:
-  liveness:
-    enabled: false   
-    path: /actuator/health/liveness
-    initialDelaySeconds: 20
-    periodSeconds: 10
-  readiness:
+  resources: {}
+  service:
+    type: ClusterIP
+  ingress:
     enabled: false
-    path: /actuator/health/readiness
-    initialDelaySeconds: 10
-    periodSeconds: 5
+    className: nginx
+    hosts: []
+    tls: []
