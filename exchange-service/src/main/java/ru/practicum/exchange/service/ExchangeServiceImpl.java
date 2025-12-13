@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import ru.practicum.exchange.config.ExchangeSettings;
+import ru.practicum.exchange.metrics.ExchangeRatesMetrics;
 import ru.practicum.platform.contracts.enums.Currency;
 import ru.practicum.platform.contracts.exchange.ExchangeGetRateResponse;
 import ru.practicum.platform.contracts.exchange.ExchangeRateItem;
@@ -23,6 +24,8 @@ public class ExchangeServiceImpl implements ExchangeService {
 
     private final ExchangeSettings settings;
     private final ConcurrentHashMap<Currency, ExchangeRateItem> rates = new ConcurrentHashMap<>();
+    private final ExchangeRatesMetrics metrics;
+    private volatile Instant lastBatchAt;
   
 
     @Override
@@ -45,6 +48,25 @@ public class ExchangeServiceImpl implements ExchangeService {
 
         validateBatch(batch);
         applyBatch(batch);
+        
+        Instant maxAt = maxAt(batch);
+        if (maxAt != null) {
+            lastBatchAt = maxAt;    
+            metrics.markRatesUpdated(maxAt); 
+        }
+    }
+
+    private Instant maxAt(List<ExchangeRateItem> batch) {
+        Instant max = null;
+        for (ExchangeRateItem it : batch) {
+            if (it == null || it.at() == null) {
+                continue;
+            }
+            if (max == null || it.at().isAfter(max)) {
+                max = it.at();
+            }
+        }
+        return max;
     }
     
     private void ensureRub() {

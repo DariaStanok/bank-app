@@ -21,6 +21,10 @@ public class MetricFormat {
         }
         return e.name().toLowerCase(Locale.ROOT);
     }
+    
+    public static String result(boolean success) {
+        return success ? "success" : "failure";
+    }
 
     public static String maskLast4(Object id) {
         if (id == null) {

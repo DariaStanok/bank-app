@@ -197,5 +197,18 @@ public class AccountsServiceImpl implements AccountsService {
         return users.findById(id).orElseThrow(() -> new NotFoundException("USER_NOT_FOUND"));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Long resolveUserIdByUsername(String username) {
+        if (username == null || username.isBlank()) {
+            throw new BadRequestException("USERNAME_REQUIRED");
+        }
+        String normalized = username.trim();
+        UserAccount user = users.findByUsername(normalized)
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND"));
+        return user.getId();
+    }
+
+
 	
 }

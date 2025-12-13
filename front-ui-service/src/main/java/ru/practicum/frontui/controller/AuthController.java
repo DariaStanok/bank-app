@@ -20,10 +20,9 @@ public class AuthController {
     private final FrontUiService front;
 
     @GetMapping("/login")
-    public String loginPage() { return "login"; }
-
-    @PostMapping("/logout")
-    public RedirectView logout() { return new RedirectView("/auth/logout"); }
+    public String loginPage() { 
+    	return "login"; 
+    }
 
     @GetMapping("/register")
     public String registerPage(Model model) {

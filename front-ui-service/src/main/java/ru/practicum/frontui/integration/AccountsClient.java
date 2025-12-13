@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.DeleteExchange;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
@@ -18,6 +19,9 @@ import ru.practicum.platform.contracts.accounts.UserViewDto;
 
 @HttpExchange
 public interface AccountsClient {
+	
+	 @GetExchange("/api/v1/users/resolve")
+	 Long resolveUserId(@RequestParam("username") String username);
 
 	@GetExchange("/api/v1/users/{userId}/accounts/view")
 	UserViewDto getUserSnapshot(@PathVariable Long userId);
