@@ -14,5 +14,6 @@ public class KafkaProperties {
     private String notificationsTopic;
     private String exchangeRatesTopic;
     private String consumerGroupId;
+    private String logsTopic;
 
 }

@@ -44,3 +44,7 @@ probes:
 
 monitoring:
   enabled: true    
+
+logging:
+  logback:
+    enabled: true

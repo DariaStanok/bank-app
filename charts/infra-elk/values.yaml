@@ -40,3 +40,16 @@ kibana:
     className: nginx
     hosts: []
     tls: []
+
+fluentbit:
+  enabled: false
+  image:
+    repository: "cr.fluentbit.io/fluent/fluent-bit"
+    tag: "2.2.2"
+    pullPolicy: IfNotPresent
+
+  kafka:
+    brokers: "infra-kafka.default.svc.cluster.local:9092"
+    topic: "bank.logs"
+
+  resources: {}

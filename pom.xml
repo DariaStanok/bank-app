@@ -40,6 +40,7 @@
     <micrometer.tracing.version>1.6.0</micrometer.tracing.version>
     <zipkin.reporter.brave.version>3.5.1</zipkin.reporter.brave.version>
     <micrometer-prometheus.version>1.13.0</micrometer-prometheus.version>
+    <logstash.logback.encoder.version>8.0</logstash.logback.encoder.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -75,6 +76,11 @@
         <groupId>io.micrometer</groupId>
         <artifactId>micrometer-registry-prometheus</artifactId>
         <version>${micrometer-prometheus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.logstash.logback</groupId>
+        <artifactId>logstash-logback-encoder</artifactId>
+        <version>${logstash.logback.encoder.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

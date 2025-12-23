@@ -46,4 +46,10 @@ probes:
 
 monitoring:
   enabled: false
-  
+
+logging:
+  logback:
+    enabled: false
+    configMapName: infra-config
+    key: logback-spring.xml
+    mountPath: /config/logback-spring.xml

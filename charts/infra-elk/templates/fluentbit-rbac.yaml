@@ -1,0 +1,30 @@
+{{- if .Values.fluentbit.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "infra-elk.fullname" . }}-fluentbit
+  labels:
+    {{- include "infra-elk.labels" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "infra-elk.fullname" . }}-fluentbit
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "namespaces"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "infra-elk.fullname" . }}-fluentbit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "infra-elk.fullname" . }}-fluentbit
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "infra-elk.fullname" . }}-fluentbit
+    namespace: {{ .Release.Namespace }}
+{{- end }}

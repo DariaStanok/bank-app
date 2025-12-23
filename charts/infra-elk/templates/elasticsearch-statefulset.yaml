@@ -32,6 +32,23 @@ spec:
               value: "false"
             - name: ES_JAVA_OPTS
               value: "{{ .Values.elasticsearch.javaOpts | default "-Xms512m -Xmx512m" }}"
+
+          readinessProbe:
+            httpGet:
+              path: /_cluster/health?wait_for_status=yellow&timeout=5s
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 6
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            failureThreshold: 5
+
           {{- if .Values.elasticsearch.resources }}
           resources:
             {{- toYaml .Values.elasticsearch.resources | nindent 12 }}

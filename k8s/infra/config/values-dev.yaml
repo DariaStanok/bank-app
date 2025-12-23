@@ -2,7 +2,6 @@
     MANAGEMENT_TRACING_ENABLED: "true"
     MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "1.0"
     MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: "http://infra-zipkin:9411/api/v2/spans"
-    LOGGING_PATTERN_LEVEL: "%5p [${spring.application.name:},traceId=%X{traceId:-},spanId=%X{spanId:-}]"
 
     MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
     MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLED: "true"

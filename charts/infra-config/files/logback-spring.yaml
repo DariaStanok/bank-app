@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+  <springProperty name="APP_NAME" source="spring.application.name" defaultValue="unknown-app"/>
+
+  <appender name="JSON_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+
+        <timestamp>
+          <fieldName>@timestamp</fieldName>
+          <timeZone>UTC</timeZone>
+        </timestamp>
+
+        <logLevel>
+          <fieldName>level</fieldName>
+        </logLevel>
+
+        <message>
+          <fieldName>message</fieldName>
+        </message>
+
+        <loggerName>
+          <fieldName>logger</fieldName>
+        </loggerName>
+
+        <threadName>
+          <fieldName>thread</fieldName>
+        </threadName>
+
+        <!-- app name (service id) -->
+        <globalCustomFields>{"app":"${APP_NAME}"}</globalCustomFields>
+
+        <!-- trace/span from MDC -->
+        <mdc>
+          <includeMdcKeyName>traceId</includeMdcKeyName>
+          <includeMdcKeyName>spanId</includeMdcKeyName>
+        </mdc>
+
+        <!-- exception as a separate field -->
+        <stackTrace>
+          <fieldName>exception</fieldName>
+        </stackTrace>
+
+      </providers>
+    </encoder>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="JSON_STDOUT"/>
+  </root>
+
+  <!-- Optional: keep noisy libs at INFO -->
+  <logger name="org.springframework" level="INFO"/>
+  <logger name="reactor.netty" level="INFO"/>
+  <logger name="org.apache.kafka" level="INFO"/>
+</configuration>
