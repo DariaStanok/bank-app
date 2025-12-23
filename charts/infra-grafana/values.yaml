@@ -1,34 +1,30 @@
-﻿replicaCount: 1
-
-image:
-  repository: "grafana/grafana"
-  tag: "12.3.0"
-  pullPolicy: IfNotPresent
-
-containerPort: 3000
-
-resources: {}
-
-clients: {}
-
-config:
-  enabled: false
-  data: {}
-
-secret:
-  enabled: false
-  data: {}
-
-service:
+﻿grafana:
   enabled: true
-  type: ClusterIP
+
+  image:
+    repository: "docker.io/grafana/grafana"
+    tag: "11.1.0"
+    pullPolicy: IfNotPresent
+
+  replicas: 1
   port: 3000
 
-ingress:
-  enabled: false
-  className: nginx
-  hosts: []
-  tls: []
+  adminUser: "admin"
+  adminPassword: "admin"   # secret, 
+
+  service:
+    type: ClusterIP
+
+  ingress:
+    enabled: false
+    className: nginx
+    hosts: []
+    tls: []
+
+  prometheus:
+    url: "http://infra-prometheus:9090"
+
+  resources: {}
 
 probes:
   liveness:

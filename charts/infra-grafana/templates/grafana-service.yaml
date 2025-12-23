@@ -1,0 +1,18 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "infra-grafana.fullname" . }}-grafana
+  labels:
+    {{- include "infra-grafana.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.grafana.service.type | default "ClusterIP" }}
+  selector:
+    app.kubernetes.io/component: grafana
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - name: http
+      port: {{ .Values.grafana.port | default 3000 }}
+      targetPort: http
+      protocol: TCP
+{{- end }}

@@ -1,0 +1,107 @@
+{{- if .Values.grafana.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "infra-grafana.fullname" . }}-grafana-provisioning
+  labels:
+    {{- include "infra-grafana.labels" . | nindent 4 }}
+data:
+  datasources.yaml: |-
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: {{ .Values.grafana.prometheus.url | quote }}
+        isDefault: true
+
+  dashboards.yaml: |-
+    apiVersion: 1
+    providers:
+      - name: "default"
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: true
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards
+
+  dashboard-spring-jvm-http.json: |-
+    {
+      "title": "Spring/JVM/HTTP (minimal)",
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "panels": []
+    }
+
+  dashboard-business-metrics.json: |-
+    {
+      "title": "Business metrics (minimal)",
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "panels": []
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "infra-grafana.fullname" . }}-grafana
+  labels:
+    {{- include "infra-grafana.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.grafana.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: grafana
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{- include "infra-grafana.labels" . | nindent 8 }}
+        app.kubernetes.io/component: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: "{{ .Values.grafana.image.repository }}:{{ .Values.grafana.image.tag }}"
+          imagePullPolicy: {{ .Values.grafana.image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.grafana.port | default 3000 }}
+
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: {{ .Values.grafana.adminUser | quote }}
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: {{ .Values.grafana.adminPassword | quote }}
+
+          {{- if .Values.grafana.resources }}
+          resources:
+            {{- toYaml .Values.grafana.resources | nindent 12 }}
+          {{- end }}
+
+          volumeMounts:
+            - name: provisioning
+              mountPath: /etc/grafana/provisioning/datasources/datasources.yaml
+              subPath: datasources.yaml
+            - name: provisioning
+              mountPath: /etc/grafana/provisioning/dashboards/dashboards.yaml
+              subPath: dashboards.yaml
+            - name: dashboards
+              mountPath: /var/lib/grafana/dashboards
+
+      volumes:
+        - name: provisioning
+          configMap:
+            name: {{ include "infra-grafana.fullname" . }}-grafana-provisioning
+        - name: dashboards
+          configMap:
+            name: {{ include "infra-grafana.fullname" . }}-grafana-provisioning
+            items:
+              - key: dashboard-spring-jvm-http.json
+                path: dashboard-spring-jvm-http.json
+              - key: dashboard-business-metrics.json
+                path: dashboard-business-metrics.json
+{{- end }}
