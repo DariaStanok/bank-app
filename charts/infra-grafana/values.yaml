@@ -3,7 +3,7 @@
 
   image:
     repository: "docker.io/grafana/grafana"
-    tag: "11.1.0"
+    tag: "12.3.0"
     pullPolicy: IfNotPresent
 
   replicas: 1
