@@ -1,0 +1,12 @@
+﻿image:
+  repository: docker.io/dariaku/auth-service
+  tag: dev
+
+env:
+  SPRING_PROFILES_ACTIVE: dev
+  SPRING_SECURITY_OAUTH2_AUTHORIZATIONSERVER_ISSUER_URI: "http://auth:8080/auth"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
+
+clients: {}     
+ingress:
+  enabled: false

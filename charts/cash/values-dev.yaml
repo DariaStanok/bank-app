@@ -1,0 +1,19 @@
+﻿image:
+  repository: docker.io/dariaku/cash-service   
+  tag: dev
+
+env:
+  SPRING_PROFILES_ACTIVE: dev
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-cash.dev.svc.cluster.local:5432/bank?currentSchema=cash"
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://auth:8080/auth"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
+
+  APP_KAFKA_BOOTSTRAP_SERVERS: ""
+  APP_KAFKA_NOTIFICATIONS_TOPIC: "" 
+
+clients:
+  accounts:      { baseUrl: "http://accounts:8080" }     
+  blocker:       { baseUrl: "http://blocker:8080" }
+  
+ingress:
+  enabled: false

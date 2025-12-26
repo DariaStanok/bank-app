@@ -1,21 +1,17 @@
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /wrk
 
-COPY ./pom.xml ./pom.xml
-COPY ./exchange-generation-service/pom.xml ./exchange-generation-service/pom.xml
+COPY . .
 
-COPY .mvn/ .mvn/
-COPY mvnw .
-RUN chmod +x mvnw && ./mvnw -q -DskipTests dependency:go-offline
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 
-COPY ./exchange-generation-service/src ./exchange-generation-service/src
+RUN ./mvnw -q -DskipTests -pl exchange-generation-service -am clean package
 
-RUN ./mvnw -q -DskipTests -pl exchange-generation-service -am package
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-COPY --from=build /wrk/exchange-generation-service/target/*.jar /app/app.jar
+COPY --from=build /wrk/exchange-generation-service/target/exchange-generation-service-*.jar /app/app.jar
 
 RUN useradd -r -u 1001 appuser && chown -R appuser /app
 USER appuser

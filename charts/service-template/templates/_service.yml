@@ -1,0 +1,27 @@
+{{- define "service-template.service" -}}
+{{- if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "service-template.fullname" . }}
+  labels:
+    {{- include "service-template.labels" . | nindent 4 }}
+{{- $monitoring := (default (dict "enabled" false) .Values.monitoring) -}}
+{{- if $monitoring.enabled }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/actuator/prometheus"
+    prometheus.io/port: "{{ .Values.service.port | default 8080 }}"
+  {{- end }}
+spec:
+  type: {{ .Values.service.type | default "ClusterIP" }}
+  selector:
+    app.kubernetes.io/name: {{ include "service-template.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - port: {{ .Values.service.port | default 8080 }}
+      targetPort: {{ .Values.containerPort | default 8080 }}
+      protocol: TCP
+      name: http
+{{- end }}
+{{- end }}

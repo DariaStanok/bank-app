@@ -1,0 +1,11 @@
+{{ include "service-template.configmap" . }}
+---
+{{ include "service-template.secret" . }}
+---
+{{ include "service-template.deployment" . }}
+---
+{{ include "service-template.service" . }}
+---
+{{ include "service-template.ingress" . }}
+---
+{{ include "service-template.tests" . }}

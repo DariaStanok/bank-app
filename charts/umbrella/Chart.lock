@@ -1,0 +1,42 @@
+dependencies:
+- name: infra-zipkin
+  repository: file://../infra-zipkin
+  version: 0.1.0
+- name: infra-prometheus
+  repository: file://../infra-prometheus
+  version: 0.1.0
+- name: infra-grafana
+  repository: file://../infra-grafana
+  version: 0.1.0
+- name: infra-elk
+  repository: file://../infra-elk
+  version: 0.1.0
+- name: infra-namespaces
+  repository: file://../infra-namespaces
+  version: 0.1.0
+- name: front-ui
+  repository: file://../front-ui
+  version: 0.1.0
+- name: accounts
+  repository: file://../accounts
+  version: 0.1.0
+- name: cash
+  repository: file://../cash
+  version: 0.1.0
+- name: transfer
+  repository: file://../transfer
+  version: 0.1.0
+- name: notifications
+  repository: file://../notifications
+  version: 0.1.0
+- name: blocker
+  repository: file://../blocker
+  version: 0.1.0
+- name: exchange
+  repository: file://../exchange
+  version: 0.1.0
+- name: exchange-generator
+  repository: file://../exchange-generator
+  version: 0.1.0
+digest: sha256:1916d000ccc7bb0f39c6807f2a5cdc4209d0291ff7dcd18d41a8acba3f026c1d
+generated: "2025-12-08T20:50:11.6141349+02:00"

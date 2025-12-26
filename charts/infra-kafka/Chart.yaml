@@ -1,0 +1,10 @@
+﻿apiVersion: v2
+name: infra-kafka
+description: Deploy Kafka via Bitnami chart
+type: application
+version: 0.1.0
+
+dependencies:
+  - name: kafka
+    version: 26.0.0
+    repository: https://charts.bitnami.com/bitnami

@@ -1,0 +1,48 @@
+﻿replicaCount: 1
+
+image:
+  repository: "prom/prometheus"
+  tag: "3.8.0"
+  pullPolicy: IfNotPresent
+
+containerPort: 9090
+
+resources: {}
+
+clients: {}
+
+config:
+  enabled: false
+  data: {}
+
+
+secret:
+  enabled: false
+  data: {}
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 9090
+
+ingress:
+  enabled: false
+  className: nginx
+  hosts: []
+  tls: []
+
+probes:
+  liveness:
+    enabled: false   
+    path: /actuator/health/liveness
+    initialDelaySeconds: 20
+    periodSeconds: 10
+  readiness:
+    enabled: false
+    path: /actuator/health/readiness
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+prometheus:
+  scrapeInterval: 10s
+  evaluationInterval: 10s    

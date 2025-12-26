@@ -1,0 +1,3 @@
+﻿  data:
+    ZIPKIN_STORAGE_TYPE: "mem"
+    SERVER_PORT: "9411"

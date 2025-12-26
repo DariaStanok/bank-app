@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import ru.practicum.exchange.gen.config.GeneratorSettings;
-import ru.practicum.exchange.gen.integration.ExchangeClient;
+import ru.practicum.kafka.starter.NotificationProducer;
 import ru.practicum.platform.contracts.enums.Currency;
 import ru.practicum.platform.contracts.exchange.ExchangeRateItem;
 import ru.practicum.web.exception.BadRequestException;
@@ -28,7 +28,7 @@ import ru.practicum.web.exception.BadRequestException;
 public class GenerationServiceImpl implements GenerationService {
 
     private final GeneratorSettings settings;
-    private final ExchangeClient exchange;
+    private final NotificationProducer notificationProducer; 
 
     private final ConcurrentHashMap<Currency, BigDecimal> last = new ConcurrentHashMap<>();
     private final AtomicBoolean inited = new AtomicBoolean(false);
@@ -50,7 +50,7 @@ public class GenerationServiceImpl implements GenerationService {
         Instant now = Instant.now();
         List<ExchangeRateItem> batch = buildBatch(now);
         if (!batch.isEmpty()) {
-            exchange.upsertRates(batch); 
+            batch.forEach(notificationProducer::sendExchangeRate);
         }
     }
 

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import ru.practicum.client.NotificationsClient;
+import ru.practicum.kafka.starter.NotificationProducer;
 import ru.practicum.platform.contracts.accounts.AccountView;
 import ru.practicum.platform.contracts.accounts.BalanceChangeDto;
 import ru.practicum.platform.contracts.blocker.BlockerCheckRequest;
@@ -17,13 +17,14 @@ import ru.practicum.platform.contracts.enums.Currency;
 import ru.practicum.platform.contracts.enums.NotificationEvent;
 import ru.practicum.platform.contracts.enums.OperationType;
 import ru.practicum.platform.contracts.enums.TransferStatus;
-import ru.practicum.platform.contracts.notifications.SendNotificationRequest;
+import ru.practicum.platform.contracts.notifications.NotificationMessageDto;
 import ru.practicum.platform.contracts.transfer.TransferDto;
 import ru.practicum.platform.contracts.transfer.TransferViewDto;
 import ru.practicum.transfer.config.TransferSettings;
 import ru.practicum.transfer.integration.AccountsClient;
 import ru.practicum.transfer.integration.BlockerClient;
 import ru.practicum.transfer.integration.ExchangeClient;
+import ru.practicum.transfer.metrics.TransferMetrics;
 import ru.practicum.transfer.model.Transfer;
 import ru.practicum.transfer.repository.TransferRepository;
 import ru.practicum.web.exception.BadRequestException;
@@ -38,12 +39,14 @@ public class TransferServiceImpl implements TransferService {
 
 	private final TransferRepository repository;
 	private final AccountsClient accounts;
-	private final NotificationsClient notifications;
+	private final NotificationProducer notificationProducer;
 	private final ModelMapper mapper;
 
 	private final TransferSettings settings;
 	private final ExchangeClient exchangeClient;
 	private final BlockerClient blockerClient;
+	private final TransferMetrics metrics;
+
 
 	@Override
 	@Transactional(readOnly = true)
@@ -72,12 +75,13 @@ public class TransferServiceImpl implements TransferService {
 			if (Boolean.TRUE.equals(settings.blockerEnabled())) {
 				BlockerCheckResponse resp = blockerClient
 						.check(new BlockerCheckRequest(from.id(), to.id(), dto.amount()));
-				if (resp == null || !resp.allowed())
+				if (resp == null || !resp.allowed()) {
+					metrics.failed(from.id(), to.id());
 					throw new ForbiddenException("TRANSFER_BLOCKED");
+				}
 			}
 
-			Transfer pending = createPendingTransfer(dto.operationId(), dto.amount(), dto.currency(), from,
-					to);
+			Transfer pending = createPendingTransfer(dto.operationId(), dto.amount(), dto.currency(), from, to);
 			return executeAndFinalize(pending, from, to);
 		});
 
@@ -128,15 +132,17 @@ public class TransferServiceImpl implements TransferService {
 		} catch (BadRequestException | ConflictException | NotFoundException | ServiceUnavailableException e) {
 			tx.setStatus(TransferStatus.FAILED);
 			repository.save(tx);
+			metrics.failed(fromId, toId);
 			notifyTransfer(tx, fromId, toId);
 			throw new ConflictException("TRANSFER_FAILED");
 		} catch (RuntimeException e) {
 			tx.setStatus(TransferStatus.FAILED);
 			repository.save(tx);
+			metrics.failed(fromId, toId);
 			notifyTransfer(tx, fromId, toId);
 			throw e;
 		}
-		
+
 		try {
 			accounts.changeBalance(toId,
 					new BalanceChangeDto(OperationType.DEPOSIT, to.currency(), tx.getCreditAmount()));
@@ -149,12 +155,14 @@ public class TransferServiceImpl implements TransferService {
 		} catch (BadRequestException | ConflictException | NotFoundException | ServiceUnavailableException e) {
 			rollbackDebit(tx, fromId, from.currency());
 			repository.save(tx);
+			metrics.failed(fromId, toId);
 			notifyTransfer(tx, fromId, toId);
 			throw new ConflictException("TRANSFER_" + tx.getStatus().name());
 		} catch (RuntimeException e) {
 			rollbackDebit(tx, fromId, from.currency());
 			repository.save(tx);
-			notifyTransfer( tx, fromId, toId);
+			metrics.failed(fromId, toId);
+			notifyTransfer(tx, fromId, toId);
 			throw e;
 		}
 	}
@@ -203,12 +211,15 @@ public class TransferServiceImpl implements TransferService {
 	        default -> "Transfer operation: " + tx.getOperationId();
 	    };
 
-	    notifications.send(new SendNotificationRequest(
-	            event,
-	            tx.getOperationId(),  
-	            null,                 
-	            msg,                  
-	            Instant.now()        
-	    ));
-	} 
+	    notificationProducer.send(
+	            NotificationMessageDto.builder()
+	                    .event(event)
+	                    .userId(null)
+	                    .accountId(fromId)
+	                    .operationId(tx.getOperationId())
+	                    .message(msg)
+	                    .at(Instant.now())
+	                    .build()
+	    );
+	}
 }

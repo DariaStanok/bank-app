@@ -6,23 +6,44 @@
 	<parent>
 		<groupId>ru.practicum</groupId>
 		<artifactId>bank-app</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>platform-notifications-client-starter</artifactId>
 	<name>platform-notifications-client-starter</name>
-	<description>Web Spring Boot application</description>
-
+	<packaging>jar</packaging>
+	<description>Platform notifications </description>
 	<dependencies>
 		<dependency>
 			<groupId>ru.practicum</groupId>
 			<artifactId>platform-contracts</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+			<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webflux</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
 			<optional>true</optional>
 		</dependency>
 
@@ -30,16 +51,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
+			<groupId>ru.practicum</groupId>
+			<artifactId>platform-http-client-starter</artifactId>
+			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 </project>

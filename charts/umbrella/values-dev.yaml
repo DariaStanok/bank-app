@@ -1,0 +1,98 @@
+﻿infra:
+  namespaces:
+    enabled: true
+  zipkin:
+    enabled: true
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
+  elk:
+    enabled: true
+
+infra-zipkin:
+  image:
+    repository: openzipkin/zipkin
+    tag: 3.5.1      
+
+infra-prometheus:
+  image:
+    repository: prom/prometheus
+    tag: 3.8.0
+
+infra-grafana:
+  image:
+    repository: grafana/grafana
+    tag: 12.3.0
+
+elasticsearch:
+  image:
+    repository: docker.elastic.co/elasticsearch/elasticsearch
+    tag: 8.18.4
+
+logstash:
+  image:
+    repository: docker.elastic.co/logstash/logstash
+    tag: 8.18.4
+
+kibana:
+  image:
+    repository: docker.elastic.co/kibana/kibana
+    tag: 8.18.4
+
+    
+front-ui: 
+  image:
+    repository: docker.io/dariaku/front-ui
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+accounts: 
+  image:
+    repository: docker.io/dariaku/accounts-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+cash: 
+  image:
+    repository: docker.io/dariaku/cash-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+transfer: 
+  image:
+    repository: docker.io/dariaku/transfer-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+notifications: 
+  image:
+    repository: docker.io/dariaku/notifications-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+blocker: 
+  image:
+    repository: docker.io/dariaku/blocker-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+exchange: 
+  image:
+    repository: docker.io/dariaku/exchange-service
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  
+
+exchange-generator:
+  image:
+    repository: docker.io/dariaku/exchange-generator
+    tag: v2
+  imagePullSecrets:
+    - name: regcred  

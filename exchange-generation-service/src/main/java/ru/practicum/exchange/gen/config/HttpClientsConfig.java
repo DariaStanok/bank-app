@@ -1,21 +1,22 @@
 package ru.practicum.exchange.gen.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.support.RestClientAdapter;
-import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+import lombok.RequiredArgsConstructor;
 import ru.practicum.exchange.gen.integration.ExchangeClient;
+import ru.practicum.httpclient.config.ClientsRegistry;
 
 @Configuration
+@RequiredArgsConstructor
 public class HttpClientsConfig {
+	
+	 private final ClientsRegistry clientsRegistry;
+	 
+	 @Bean
+	 ExchangeClient exchange () {
+		 return clientsRegistry.httpService("exchange generation service", ExchangeClient.class);
+	 }
+ 
 
-	@Bean
-	@ConditionalOnProperty(prefix = "features", name = "exchange-enabled", havingValue = "true")
-	ExchangeClient exchangeClient(RestClient restClient) {
-		return HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient)).build()
-				.createClient(ExchangeClient.class);
-	}
 }

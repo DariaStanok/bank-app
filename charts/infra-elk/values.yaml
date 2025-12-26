@@ -1,0 +1,55 @@
+﻿elasticsearch:
+  enabled: true
+  image:
+    repository: "docker.elastic.co/elasticsearch/elasticsearch"
+    tag: "8.18.4"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 9200
+  resources: {}
+  storage:
+    enabled: true
+    size: 2Gi
+    storageClassName: ""
+  javaOpts: "-Xms512m -Xmx512m"
+
+logstash:
+  enabled: true
+  image:
+    repository: "docker.elastic.co/logstash/logstash"
+    tag: "8.18.4"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 5044
+  resources: {}
+  pipeline: ""  
+
+kibana:
+  enabled: true
+  image:
+    repository: "docker.elastic.co/kibana/kibana"
+    tag: "8.18.4"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 5601
+  resources: {}
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: false
+    className: nginx
+    hosts: []
+    tls: []
+
+fluentbit:
+  enabled: false
+  image:
+    repository: "cr.fluentbit.io/fluent/fluent-bit"
+    tag: "2.2.2"
+    pullPolicy: IfNotPresent
+
+  kafka:
+    brokers: "infra-kafka.default.svc.cluster.local:9092"
+    topic: "bank.logs"
+
+  resources: {}

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import ru.practicum.blocker.config.BlockerSettings;
+import ru.practicum.blocker.metrics.BlockerMetrics;
 import ru.practicum.platform.contracts.blocker.BlockerCheckRequest;
 import ru.practicum.platform.contracts.blocker.BlockerCheckResponse;
 import ru.practicum.web.exception.BadRequestException;
@@ -21,14 +22,17 @@ import ru.practicum.web.exception.BadRequestException;
 public class BlockerServiceImpl implements BlockerService {
 
 	private final BlockerSettings settings;
+	private final BlockerMetrics metrics;
 
     @Override
     public BlockerCheckResponse check(BlockerCheckRequest req) {
         validate(req);
         if (req.amount().compareTo(settings.threshold()) > 0) {
+            metrics.blocked(); 
             return new BlockerCheckResponse(false);
         }
         if (settings.denyPercent() > 0 && hitDeterministicDeny(req)) {
+            metrics.blocked(); 
             return new BlockerCheckResponse(false);
         }
         return new BlockerCheckResponse(true);

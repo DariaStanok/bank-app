@@ -11,18 +11,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import ru.practicum.cash.integration.AccountsClient;
+import ru.practicum.cash.integration.BlockerClient;
 import ru.practicum.cash.model.CashOperation;
 import ru.practicum.cash.repository.CashOperationRepository;
-import ru.practicum.client.NotificationsClient;
+import ru.practicum.kafka.starter.NotificationProducer;
 import ru.practicum.platform.contracts.accounts.AccountView;
 import ru.practicum.platform.contracts.accounts.BalanceChangeDto;
 import ru.practicum.platform.contracts.accounts.NewBalanceDto;
+import ru.practicum.platform.contracts.blocker.BlockerCheckRequest;
+import ru.practicum.platform.contracts.blocker.BlockerCheckResponse;
 import ru.practicum.platform.contracts.cash.CashChangeDto;
 import ru.practicum.platform.contracts.cash.CashOperationViewDto;
 import ru.practicum.platform.contracts.enums.CashOpStatus;
 import ru.practicum.platform.contracts.enums.NotificationEvent;
 import ru.practicum.platform.contracts.enums.OperationType;
-import ru.practicum.platform.contracts.notifications.SendNotificationRequest;
+import ru.practicum.platform.contracts.notifications.NotificationMessageDto;
 import ru.practicum.web.exception.BadRequestException;
 import ru.practicum.web.exception.ConflictException;
 import ru.practicum.web.exception.NotFoundException;
@@ -33,7 +36,8 @@ public class CashServiceImpl implements CashService {
 
     private final CashOperationRepository operations;
     private final AccountsClient accounts;
-    private final NotificationsClient notifications;
+    private final BlockerClient blocker;  
+    private final NotificationProducer notificationProducer;
     private final ModelMapper mapper;
 
     @Override 
@@ -55,8 +59,9 @@ public class CashServiceImpl implements CashService {
         if (existing != null) {
         	return toView(existing);
         }
-
         AccountView account = loadAndValidateAccount(dto);
+        checkWithBlocker(type, dto);
+
         CashOperation op = createPendingOperation(type, dto, idemKey);
         NewBalanceDto newBal = applyBalanceChangeInAccounts(dto, type);
         finalizeSuccess(op, newBal.newBalance(), newBal.at());
@@ -129,17 +134,38 @@ public class CashServiceImpl implements CashService {
                 " from account " + acc.id();
         default -> "Cash operation: " + op.getId();
     };
-    notifications.send(new SendNotificationRequest(
-    		event,
-    		op.getId(),
-    		null,
-    		msg,
-    		Instant.now()
-    ));
+    
+    notificationProducer.send(
+            NotificationMessageDto.builder()
+                    .event(event)
+                    .userId(null)
+                    .accountId(acc.id())
+                    .operationId(op.getId())
+                    .message(msg)
+                    .at(Instant.now())
+                    .build()
+    );
   
     }
 
     private CashOperationViewDto toView(CashOperation op) {
         return mapper.map(op, CashOperationViewDto.class);
+    }
+    
+    private void checkWithBlocker(OperationType type, CashChangeDto dto) {
+        if (type != OperationType.WITHDRAW) {
+            return;
+        }
+
+        BlockerCheckRequest request = new BlockerCheckRequest(
+                dto.accountId(),   
+                null,               
+                dto.amount()
+        );
+
+        BlockerCheckResponse response = blocker.check(request);
+        if (response == null || !response.allowed()) {
+            throw new ConflictException("OPERATION_BLOCKED");
+        }
     }
 }

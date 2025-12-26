@@ -45,6 +45,6 @@ public interface FrontUiService {
 
 	void changePassword(Long userId, ChangePasswordDto dto);
 
-	void deleteUser(Long userId);
+	void deleteUser(Long userId);	
 
 }

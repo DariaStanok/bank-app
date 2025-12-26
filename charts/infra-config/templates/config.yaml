@@ -1,0 +1,26 @@
+{{- if and .Values.config.enabled (or .Values.config.data .Values.config.logbackEnabled .Values.config.files) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.config.name | default "infra-config" }}
+  labels:
+    app.kubernetes.io/name: infra-config
+data:
+  {{- if .Values.config.data }}
+  {{- range $key, $val := .Values.config.data }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+  {{- end }}
+
+  {{- if .Values.config.logbackEnabled }}
+  logback-spring.xml: |-
+{{ .Files.Get (printf "files/%s" (.Values.config.logback.file | default "logback-spring.xml")) | nindent 4 }}
+  {{- end }}
+
+   {{- if .Values.config.files }}  #for another future files
+  {{- range $key, $val := .Values.config.files }}
+  {{ $key }}: |-
+{{ $val | nindent 4 }}
+  {{- end }}
+  {{- end }}
+{{- end }}

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -22,44 +23,50 @@ import ru.practicum.platform.contracts.accounts.UserViewDto;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users/{userId}/accounts")
+@RequestMapping("/api/v1/users")
 public class AccountsController {
 
     private final AccountsService accountsService;
 
-    
-    @GetMapping("/view")
+    @GetMapping("/resolve")
+    public Long resolveUserId(@RequestParam("username") String username) {
+        return accountsService.resolveUserIdByUsername(username);
+    }
+
+    @GetMapping("/{userId}/view")
     public UserViewDto getUserSnapshot(@PathVariable Long userId) {
         return accountsService.getUserSnapshot(userId);
     }
-    @GetMapping
+
+    @GetMapping("/{userId}/accounts")
     public List<AccountView> getAccounts(@PathVariable Long userId) {
         return accountsService.getUserAccounts(userId);
     }
 
-    @PostMapping
+    @PostMapping("/{userId}/accounts")
     public AccountView createAccount(@PathVariable Long userId,
                                      @RequestBody @Valid UpdateExternalAccount dto) {
         return accountsService.createAccount(userId, dto);
     }
 
-    @PutMapping("/{accountId}")
+    @PutMapping("/{userId}/accounts/{accountId}")
     public AccountView updateAccount(@PathVariable Long userId,
                                      @PathVariable Long accountId,
                                      @RequestBody @Valid UpdateExternalAccount dto) {
         return accountsService.updateAccount(userId, accountId, dto);
     }
 
-    @DeleteMapping("/{accountId}")
+    @DeleteMapping("/{userId}/accounts/{accountId}")
     public Boolean deleteAccount(@PathVariable Long userId, @PathVariable Long accountId) {
         accountsService.deleteAccount(userId, accountId);
         return Boolean.TRUE;
     }
 
-    @PostMapping("/{accountId}/balance-change")
-    public NewBalanceDto changeBalance(@PathVariable Long userId,        
+    @PostMapping("/{userId}/accounts/{accountId}/balance-change")
+    public NewBalanceDto changeBalance(@PathVariable Long userId,
                                        @PathVariable Long accountId,
                                        @RequestBody @Valid BalanceChangeDto dto) {
         return accountsService.changeBalance(accountId, dto);
     }
 }
+

@@ -21,6 +21,8 @@ public interface AccountsService {
     void deleteAccount(Long userId, Long accountId);
     
  	NewBalanceDto changeBalance(Long accountId, BalanceChangeDto dto);
+ 	
+ 	Long resolveUserIdByUsername(String username);
 
 
 }

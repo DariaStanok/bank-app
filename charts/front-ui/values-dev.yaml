@@ -1,0 +1,24 @@
+﻿image:
+  repository: docker.io/dariaku/front-ui
+  tag: dev
+
+env:
+  SPRING_PROFILES_ACTIVE: dev
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FRONT_UI_CLIENT_ID: "front-ui"
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FRONT_UI_AUTHORIZATION_GRANT_TYPE: "authorization_code"
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FRONT_UI_REDIRECT_URI: "{baseUrl}/login/oauth2/code/front-ui"
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_FRONT_UI_SCOPE: "openid,profile"
+
+  SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_FRONT_UI_ISSUER_URI: "http://auth:8080/auth"
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info,prometheus,metrics"
+
+  ACCOUNTS_BASE_URL: "http://accounts:8080"
+  CASH_BASE_URL: "http://cash:8080"
+  TRANSFER_BASE_URL: "http://transfer:8080"
+  NOTIFICATIONS_BASE_URL: "http://notifications:8080"
+  AUTH_BASE_URL: "http://auth:8080"
+
+clients: {}  
+
+ingress:
+  enabled: true

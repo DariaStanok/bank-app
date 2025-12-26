@@ -1,0 +1,6 @@
+﻿registry:
+  server: ""      
+  username: ""   
+  password: ""    
+  email: ""      
+  secretName: regcred

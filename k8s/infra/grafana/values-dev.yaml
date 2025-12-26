@@ -1,0 +1,12 @@
+﻿grafana:
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: grafana-dev.local
+        paths:
+          - path: /
+            pathType: Prefix
+
+  prometheus:
+    url: "http://infra-prometheus:9090"

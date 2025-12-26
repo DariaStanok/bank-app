@@ -14,7 +14,7 @@ import ru.practicum.accounts.model.Account;
 import ru.practicum.accounts.model.UserAccount;
 import ru.practicum.accounts.repository.AccountRepository;
 import ru.practicum.accounts.repository.UserAccountRepository;
-import ru.practicum.client.NotificationsClient;
+import ru.practicum.kafka.starter.NotificationProducer;
 import ru.practicum.platform.contracts.accounts.AccountView;
 import ru.practicum.platform.contracts.accounts.BalanceChangeDto;
 import ru.practicum.platform.contracts.accounts.NewBalanceDto;
@@ -22,7 +22,7 @@ import ru.practicum.platform.contracts.accounts.UpdateExternalAccount;
 import ru.practicum.platform.contracts.accounts.UserDto;
 import ru.practicum.platform.contracts.accounts.UserViewDto;
 import ru.practicum.platform.contracts.enums.NotificationEvent;
-import ru.practicum.platform.contracts.notifications.SendNotificationRequest;
+import ru.practicum.platform.contracts.notifications.NotificationMessageDto;
 import ru.practicum.web.exception.BadRequestException;
 import ru.practicum.web.exception.ConflictException;
 import ru.practicum.web.exception.NotFoundException;
@@ -33,7 +33,7 @@ public class AccountsServiceImpl implements AccountsService {
 
     private final UserAccountRepository users;
     private final AccountRepository accounts;
-    private final NotificationsClient notifications;
+    private final NotificationProducer notificationProducer;
     private final ModelMapper mapper;
 
     @Override
@@ -91,13 +91,15 @@ public class AccountsServiceImpl implements AccountsService {
             users.save(user);
         }
 
-        notifications.send(new SendNotificationRequest(
-        	    NotificationEvent.ACCOUNT_CREATED,
-        	    null,
-        	    user.getId(),
-        	    "Account created: " + dto.currency(),
-        	    Instant.now()
-        ));
+        notificationProducer.send(
+                NotificationMessageDto.builder()
+                        .event(NotificationEvent.ACCOUNT_CREATED)
+                        .userId(user.getId())
+                        .accountId(acc.getId())
+                        .message("Account created: " + dto.currency())
+                        .at(Instant.now())
+                        .build()
+        );
 
         return mapper.map(acc, AccountView.class);
     }
@@ -116,13 +118,15 @@ public class AccountsServiceImpl implements AccountsService {
         acc.setCurrency(dto.currency());
         accounts.save(acc);
 
-        notifications.send(new SendNotificationRequest(
-        		  NotificationEvent.ACCOUNT_UPDATED,
-                  null,
-                  acc.getUser().getId(),
-                  "Account updated: " + dto.currency(),
-                  Instant.now()
-        ));
+        notificationProducer.send(
+                NotificationMessageDto.builder()
+                .event(NotificationEvent.ACCOUNT_UPDATED)
+                .userId(acc.getUser().getId())
+                .accountId(acc.getId())
+                .message("Account updated: " + dto.currency()) 
+                .at(Instant.now())
+                .build()
+        );
 
         return mapper.map(acc, AccountView.class);
     }
@@ -146,13 +150,14 @@ public class AccountsServiceImpl implements AccountsService {
             users.save(user);
         }
 
-        notifications.send(new SendNotificationRequest(
-                NotificationEvent.ACCOUNT_DELETED,
-                null,
-                user.getId(),
-                "Account deleted: " + acc.getCurrency(),
-                Instant.now()
-        ));
+        notificationProducer.send(
+                NotificationMessageDto.builder()
+        		.event(NotificationEvent.ACCOUNT_DELETED)
+        		.userId(user.getId())
+        		.message("Account deleted: " + acc.getCurrency())
+        		.at(Instant.now())
+                .build()
+        );
     }
 
     @Override
@@ -191,6 +196,19 @@ public class AccountsServiceImpl implements AccountsService {
     private UserAccount loadUser(Long id) {
         return users.findById(id).orElseThrow(() -> new NotFoundException("USER_NOT_FOUND"));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Long resolveUserIdByUsername(String username) {
+        if (username == null || username.isBlank()) {
+            throw new BadRequestException("USERNAME_REQUIRED");
+        }
+        String normalized = username.trim();
+        UserAccount user = users.findByUsername(normalized)
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND"));
+        return user.getId();
+    }
+
 
 	
 }

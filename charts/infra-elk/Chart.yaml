@@ -1,0 +1,6 @@
+﻿apiVersion: v2
+name: infra-elk
+description: ELK (Elasticsearch + Logstash + Kibana) stack for bank-app
+type: application
+version: 0.1.0
+

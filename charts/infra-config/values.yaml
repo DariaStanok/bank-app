@@ -1,0 +1,8 @@
+﻿config:
+  enabled: true
+  name: infra-config
+  data: {}
+
+  logback:
+    enabled: true
+    file: logback-spring.xml

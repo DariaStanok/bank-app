@@ -1,0 +1,5 @@
+﻿apiVersion: v2
+name: infra-prometheus
+description: Prometheus monitoring for bank-app
+type: application
+version: 0.1.0

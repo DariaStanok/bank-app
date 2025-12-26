@@ -1,0 +1,40 @@
+﻿elasticsearch:
+  storage:
+    size: 2Gi
+    storageClassName: ""
+  javaOpts: "-Xms512m -Xmx512m"
+
+fluentbit:
+  enabled: true
+  kafka:
+    brokers: "infra-kafka.default.svc.cluster.local:9092"
+    topic: "bank.logs"
+
+logstash:
+  pipeline: |-
+    input {
+      kafka {
+        bootstrap_servers => "infra-kafka.default.svc.cluster.local:9092"
+        topics => ["bank.logs"]
+        group_id => "logstash-bank-logs"
+        codec => json
+      }
+    }
+    filter {
+    }
+    output {
+      elasticsearch {
+        hosts => ["http://{{ .Release.Name }}-infra-elk-elasticsearch:9200"]
+        index => "bank-logs-%{+YYYY.MM.dd}"
+      }
+    }
+
+kibana:
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: kibana-dev.local
+        paths:
+          - path: /
+            pathType: Prefix
